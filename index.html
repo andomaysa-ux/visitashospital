@@ -279,6 +279,14 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
         <div class="opt" data-v="sim">Sim</div>
       </div>
     </div>
+    <div class="field">
+      <label>Uso de caneta emagrecedora (GLP-1)?</label>
+      <div class="togglebtns" id="fCaneta">
+        <div class="opt" data-v="nao">Não</div>
+        <div class="opt" data-v="sim">Sim</div>
+      </div>
+    </div>
+    <div class="field hidden" id="canetaNomeWrap"><label>Qual medicação?</label><input type="text" id="fCanetaNome" placeholder="Ex: semaglutida, tirzepatida, liraglutida"></div>
   </div>
 
   <div class="card">
@@ -436,6 +444,7 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
     <div class="card-title"><span class="ic">📄</span> Evolução Nutricional</div>
     <div class="gen-block" id="genEvolucao">—</div>
     <button class="copybtn" id="btnCopiarEvolucao">📋 Copiar Evolução</button>
+    <button class="copybtn" id="btnSalvarEvolucaoCelular" style="margin-top:10px; background:var(--surface); color:var(--text); border:1px solid var(--border);">💾 Salvar evolução no celular</button>
   </div>
 </section>
 
@@ -466,6 +475,7 @@ let state = {
   egConsciencia:'', egColaboracao:'', egAcompanhante:'',
   triResultado:'',
   dietaTasy:'', dietaPos:'', dietaEspecial:'nao',
+  caneta:'nao', canetaNome:'',
   aceitacao:{}, preferenciasTxt:'', bloqueiosTxt:'',
   alergias:'', intolerancias:'', sensibilidades:'',
   sintomas:[], obsGastro:'',
@@ -523,6 +533,11 @@ bindSingle('egConsciencia', v=>{ state.egConsciencia=v; recalc(); });
 bindSingle('egColaboracao', v=>{ state.egColaboracao=v; recalc(); });
 bindSingle('egAcompanhante', v=>{ state.egAcompanhante=v; recalc(); });
 bindSingle('dietaEspecial', v=>{ state.dietaEspecial=v; recalc(); });
+bindSingle('fCaneta', v=>{
+  state.caneta=v;
+  document.getElementById('canetaNomeWrap').classList.toggle('hidden', v!=='sim');
+  recalc();
+});
 bindMulti('fSintomas', state.sintomas, recalc, 'Sem sintomas');
 bindSingle('fEvacuacao', v=>{ state.evacuacao=v; recalc(); });
 bindSingle('fEvacMed', v=>{
@@ -554,7 +569,8 @@ const textBindings = [
   ['fAlergias','alergias'],['fIntolerancias','intolerancias'],['fSensibilidades','sensibilidades'],
   ['fHidratacao','hidratacao'],['fJejumHorario','jejumHorario'],['fJejumMotivo','jejumMotivo'],
   ['fOutrasComorb','outrasComorb'],['fEspecClinica','especClinica'],['fObsGastro','obsGastro'],
-  ['fEvacMedicamento','evacMedicamento'],['fEvacUltimaData','evacUltimaData'],['fNascimento','nascimento']
+  ['fEvacMedicamento','evacMedicamento'],['fEvacUltimaData','evacUltimaData'],['fNascimento','nascimento'],
+  ['fCanetaNome','canetaNome']
 ];
 textBindings.forEach(([id,key])=>{
   document.getElementById(id).addEventListener('input', e=>{ state[key]=e.target.value; recalc(); });
@@ -756,6 +772,19 @@ function recalc(){
 
   renderGestao();
   renderEvolucao();
+  scheduleAutosave();
+}
+
+let autosaveTimer = null;
+function scheduleAutosave(){
+  if(!state.leito) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(async ()=>{
+    try{
+      const record = {...state, savedAt: nowBR().toISOString(), dataVisita: state._dataVisita.toISOString(), proxima: state._proxima.toISOString(), nivel: state._nivel, oms: state._oms, imc: state._imc, autosaved:true};
+      await window.storage.set('visita:'+state.leito, JSON.stringify(record), false);
+    }catch(e){ /* autosave falhou silenciosamente, o botão Salvar visita continua disponível */ }
+  }, 1200);
 }
 
 /* ---------------- GESTÃO DA NUTRIÇÃO ---------------- */
@@ -874,6 +903,10 @@ function fraseDieta(){
   const padrao = state.dietaPos || state.dietaTasy;
   return padrao ? `Em uso de ${padrao.toLowerCase()}.` : 'Padrão alimentar não especificado.';
 }
+function fraseCaneta(){
+  if(state.caneta==='sim') return `Faz uso de caneta emagrecedora${state.canetaNome ? ' ('+state.canetaNome+')' : ''}.`;
+  return 'Nega uso de caneta emagrecedora.';
+}
 function fraseComorbidades(){
   const list = [...state.comorbidades];
   if(state.outrasComorb) list.push(state.outrasComorb);
@@ -894,6 +927,7 @@ function renderEvolucao(){
     fraseComorbidades() + ` Próxima visita: ${proxima}.`,
     fraseEstadoNutricional(),
     fraseDieta(),
+    fraseCaneta(),
     fraseAceitacao(),
     listOrNegative(state.alergias, 'Nega alergias alimentares.', 'Refere alergia a '),
     listOrNegative(state.intolerancias, 'Nega intolerâncias alimentares.', 'Refere intolerância a '),
@@ -928,6 +962,30 @@ document.querySelectorAll('[data-copy]').forEach(btn=>{
   });
 });
 document.getElementById('btnCopiarEvolucao').onclick = ()=>{ copyText(document.getElementById('genEvolucao').textContent); };
+
+async function salvarEvolucaoCelular(){
+  const text = document.getElementById('genEvolucao').textContent;
+  const dataTag = state._dataVisita ? fmtDate(state._dataVisita).split('/').join('-') : 'sem-data';
+  const filename = `evolucao_leito_${state.leito||'sem-leito'}_${dataTag}.txt`;
+  if(navigator.canShare){
+    try{
+      const file = new File([text], filename, {type:'text/plain'});
+      if(navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], title:'Evolução Nutricional', text:'Evolução leito '+(state.leito||'')});
+        showToast('Evolução salva/compartilhada');
+        return;
+      }
+    }catch(e){ /* usuário cancelou ou não suportado, cai no fallback */ }
+  }
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  showToast('Evolução baixada no celular');
+}
+document.getElementById('btnSalvarEvolucaoCelular').onclick = salvarEvolucaoCelular;
 
 /* ---------------- TABS ---------------- */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -986,6 +1044,7 @@ async function renderPainel(){
   document.getElementById('fData').value = fmtDate(d);
   document.getElementById('fJejum').querySelector('[data-v="nao"]').classList.add('on');
   document.getElementById('fEvacMed').querySelector('[data-v="nao"]').classList.add('on');
+  document.getElementById('fCaneta').querySelector('[data-v="nao"]').classList.add('on');
   document.getElementById('dietaEspecial').querySelector('[data-v="nao"]').classList.add('on');
   recalc();
 })();
