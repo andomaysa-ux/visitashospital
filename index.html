@@ -60,7 +60,6 @@ label{display:block; font-size:12.5px; color:var(--text-dim); margin-bottom:6px;
 .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
 .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
 
-/* Header */
 header{position:sticky; top:0; z-index:30; backdrop-filter:blur(18px); background:rgba(10,13,20,0.55); border-bottom:1px solid var(--border-soft); padding:14px 16px 12px;}
 html[data-theme="comfort"] header{background:rgba(243,236,216,0.7);}
 .hdr-top{display:flex; align-items:center; justify-content:space-between; gap:10px;}
@@ -83,7 +82,10 @@ main{max-width:640px; margin:0 auto; padding:16px;}
 .card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow);}
 .card-title{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; margin-bottom:14px; color:var(--text);}
 .card-title .ic{font-size:15px;}
+.card-title .tag{margin-left:auto; font-size:10px; padding:3px 8px; border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.04em;}
 .section-label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); margin:0 0 10px 2px;}
+.sub-label{font-size:11.5px; color:var(--text-dim); margin:14px 0 8px; font-weight:600;}
+.sub-label:first-child{margin-top:0;}
 
 .chipselect{display:flex; flex-wrap:wrap; gap:8px;}
 .chipselect .opt{padding:9px 14px; border-radius:11px; border:1px solid var(--border); background:var(--surface); font-size:13.5px; cursor:pointer; color:var(--text-dim); transition:.15s;}
@@ -110,8 +112,10 @@ html[data-theme="comfort"] .togglebtns .opt.on{color:#fff;}
 .calc-item{background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:10px 12px;}
 .calc-item .k{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
 .calc-item .v{font-size:15px; font-weight:600; margin-top:2px;}
+.calc-item.wide{grid-column:1/-1;}
+.protocol-note{font-size:11.5px; color:var(--text-dim); background:var(--surface); border:1px dashed var(--border); border-radius:10px; padding:9px 11px; margin-bottom:14px; line-height:1.5;}
+.protocol-note b{color:var(--text);}
 
-/* Tabs nav */
 nav.tabbar{position:fixed; bottom:0; left:0; right:0; z-index:40; backdrop-filter:blur(20px); background:rgba(10,13,20,0.72); border-top:1px solid var(--border-soft); display:flex; padding:8px 10px calc(8px + env(safe-area-inset-bottom));}
 html[data-theme="comfort"] nav.tabbar{background:rgba(243,236,216,0.85);}
 nav.tabbar button{flex:1; background:none; border:none; color:var(--text-faint); display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; padding:6px 2px; border-radius:12px; cursor:pointer;}
@@ -146,11 +150,20 @@ html[data-theme="dark"] .addbar button{color:#0A0D14;}
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
 .empty{text-align:center; padding:40px 20px; color:var(--text-faint); font-size:13.5px;}
-.newbtn{position:fixed; right:16px; bottom:96px; width:52px; height:52px; border-radius:16px; background:var(--accent-grad); border:none; color:#fff; font-size:24px; box-shadow:0 6px 24px var(--accent-soft); cursor:pointer; z-index:35;}
-html[data-theme="dark"] .newbtn{color:#0A0D14;}
 textarea{min-height:70px; resize:vertical;}
 .hidden{display:none !important;}
 .readonly-note{font-size:11px; color:var(--text-faint); margin-top:-9px; margin-bottom:14px; display:flex; align-items:center; gap:5px;}
+
+.meal-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--border-soft);}
+.meal-row:last-child{border-bottom:none;}
+.meal-row .mlabel{font-size:13px; font-weight:500; width:110px; flex-shrink:0;}
+.meal-pct{display:flex; gap:5px; flex:1;}
+.meal-pct .p{flex:1; text-align:center; padding:6px 0; border-radius:8px; border:1px solid var(--border); font-size:11.5px; color:var(--text-faint); cursor:pointer;}
+.meal-pct .p.on{background:var(--accent-grad); color:#fff; border-color:transparent; font-weight:600;}
+html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
+
+.chartwrap{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:10px;}
+.chart-note{font-size:10.5px; color:var(--text-faint); text-align:center; margin-top:6px; line-height:1.5;}
 </style>
 </head>
 <body>
@@ -190,10 +203,48 @@ textarea{min-height:70px; resize:vertical;}
         <input type="text" id="fData" disabled>
       </div>
     </div>
+    <div class="row2">
+      <div class="field">
+        <label>Data de nascimento</label>
+        <input type="date" id="fNascimento">
+      </div>
+      <div class="field">
+        <label>Sexo</label>
+        <div class="togglebtns" id="fSexo">
+          <div class="opt" data-v="F">Feminino</div>
+          <div class="opt" data-v="M">Masculino</div>
+        </div>
+      </div>
+    </div>
+    <div class="protocol-note" id="idadeInfo">Informe a data de nascimento para o app definir automaticamente idade, faixa etária e o protocolo de triagem (STRONG Kids, NRS-2002 ou MNA).</div>
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="ic">📏</span> Antropometria</div>
+    <div class="card-title"><span class="ic">🙂</span> Estado Geral</div>
+    <div class="sub-label">Nível de consciência</div>
+    <div class="chipselect wrap" id="egConsciencia">
+      <div class="opt" data-v="Consciente">Consciente</div>
+      <div class="opt" data-v="Sonolento">Sonolento</div>
+      <div class="opt" data-v="Confusão mental">Confusão mental</div>
+      <div class="opt" data-v="Fala desconexa">Fala desconexa</div>
+      <div class="opt" data-v="Não responsivo">Não responsivo</div>
+      <div class="opt" data-v="Sedado">Sedado</div>
+    </div>
+    <div class="sub-label">Colaboração</div>
+    <div class="chipselect wrap" id="egColaboracao">
+      <div class="opt" data-v="Colaborativo">Colaborativo</div>
+      <div class="opt" data-v="Pouco colaborativo">Pouco colaborativo</div>
+      <div class="opt" data-v="Não colaborativo">Não colaborativo</div>
+    </div>
+    <div class="sub-label">Acompanhante</div>
+    <div class="togglebtns" id="egAcompanhante">
+      <div class="opt" data-v="Com acompanhante">Com acompanhante</div>
+      <div class="opt" data-v="Sem acompanhante">Sem acompanhante</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">📏</span> Antropometria<span class="tag" id="protocoloTag">—</span></div>
     <div class="row2">
       <div class="field"><label>Peso (kg)</label><input type="number" step="0.1" id="fPeso" placeholder="72"></div>
       <div class="field"><label>Altura (cm)</label><input type="number" id="fAltura" placeholder="170"></div>
@@ -201,21 +252,20 @@ textarea{min-height:70px; resize:vertical;}
     <div class="field"><label>PPR (perda de peso recente)</label><input type="text" id="fPPR" placeholder="Ex: 3kg em 30 dias, ou 'nega'"></div>
     <div class="calc-grid">
       <div class="calc-item"><div class="k">IMC</div><div class="v" id="calcIMC">—</div></div>
-      <div class="calc-item"><div class="k">Estado nutricional (OMS)</div><div class="v" id="calcOMS">—</div></div>
+      <div class="calc-item"><div class="k">Estado nutricional</div><div class="v" id="calcOMS">—</div></div>
+      <div class="calc-item hidden" id="itemZscore"><div class="k">Escore Z (IMC/idade)</div><div class="v" id="calcZ">—</div></div>
+      <div class="calc-item hidden" id="itemPercentil"><div class="k">Percentil aproximado</div><div class="v" id="calcPercentil">—</div></div>
+    </div>
+    <div id="chartArea" class="hidden">
+      <div class="sub-label">Plotagem na curva OMS (IMC por idade)</div>
+      <div class="chartwrap"><svg id="whoChart" viewBox="0 0 320 190" style="width:100%; height:auto;"></svg></div>
+      <div class="chart-note">Curvas ilustrativas para orientar a visita — não substituem as tabelas oficiais LMS da OMS para registro clínico definitivo.</div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="ic">📋</span> Triagem</div>
-    <div class="field">
-      <label>Instrumento</label>
-      <div class="chipselect" id="triInstrumento">
-        <div class="opt" data-v="STRONG Kids">STRONG Kids</div>
-        <div class="opt" data-v="NRS-2002">NRS-2002</div>
-        <div class="opt" data-v="MNA">MNA</div>
-      </div>
-    </div>
-    <div class="field"><label>Resultado</label><input type="text" id="fTriResultado" placeholder="Ex: Baixo risco / 3 pontos"></div>
+    <div class="card-title"><span class="ic">📋</span> Triagem<span class="tag" id="protocoloTag2">—</span></div>
+    <div class="field"><label id="triResultLabel">Resultado</label><input type="text" id="fTriResultado" placeholder="Ex: Baixo risco / 3 pontos"></div>
   </div>
 
   <div class="card">
@@ -232,25 +282,9 @@ textarea{min-height:70px; resize:vertical;}
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="ic">🍴</span> Alimentação</div>
-    <div class="row2">
-      <div class="field">
-        <label>Apetite</label>
-        <div class="chipselect wrap" id="fApetite">
-          <div class="opt" data-v="Preservado">Preservado</div>
-          <div class="opt" data-v="Reduzido">Reduzido</div>
-          <div class="opt" data-v="Ausente">Ausente</div>
-        </div>
-      </div>
-    </div>
-    <div class="field">
-      <label>Aceitação</label>
-      <div class="chipselect grid3" id="fAceitacao">
-        <div class="opt" data-v="&lt;25%">&lt;25%</div><div class="opt" data-v="25%">25%</div><div class="opt" data-v="50%">50%</div>
-        <div class="opt" data-v="75%">75%</div><div class="opt" data-v="100%">100%</div>
-      </div>
-    </div>
-    <div class="field"><label>Preferências</label><input type="text" id="fPreferencias" placeholder="Ex: água de coco, suco de manga"></div>
+    <div class="card-title"><span class="ic">🍴</span> Aceitação alimentar</div>
+    <div id="mealRows"></div>
+    <div class="field" style="margin-top:12px;"><label>Preferências</label><input type="text" id="fPreferencias" placeholder="Ex: água de coco, suco de manga"></div>
     <div class="field"><label>Bloqueios alimentares (não gosta)</label><input type="text" id="fBloqueios" placeholder="Ex: peixe, quiabo"></div>
     <div class="field"><label>Alergias</label><input type="text" id="fAlergias" placeholder="Ex: ovo"></div>
     <div class="field"><label>Intolerâncias</label><input type="text" id="fIntolerancias" placeholder="Ex: lactose"></div>
@@ -259,30 +293,32 @@ textarea{min-height:70px; resize:vertical;}
 
   <div class="card">
     <div class="card-title"><span class="ic">💩</span> Gastrointestinal</div>
-    <div class="field">
-      <label>Sintomas intestinais</label>
-      <div class="chipselect wrap" id="fSintomas">
-        <div class="opt" data-v="Nenhum">Nenhum</div><div class="opt" data-v="Estufamento">Estufamento</div>
-        <div class="opt" data-v="Gases">Gases</div><div class="opt" data-v="Constipação">Constipação</div>
-        <div class="opt" data-v="Diarreia">Diarreia</div><div class="opt" data-v="Náusea">Náusea</div>
-        <div class="opt" data-v="Vômito">Vômito</div><div class="opt" data-v="Dor abdominal">Dor abdominal</div>
-        <div class="opt" data-v="Refluxo">Refluxo</div>
-      </div>
+    <div class="sub-label">Sintomas</div>
+    <div class="chipselect wrap" id="fSintomas">
+      <div class="opt" data-v="Estufamento">Estufamento</div><div class="opt" data-v="Gases">Gases</div>
+      <div class="opt" data-v="Constipação">Constipação</div><div class="opt" data-v="Diarreia">Diarreia</div>
+      <div class="opt" data-v="Náusea">Náusea</div><div class="opt" data-v="Vômito">Vômito</div>
+      <div class="opt" data-v="Dor abdominal">Dor abdominal</div><div class="opt" data-v="Refluxo">Refluxo</div>
+      <div class="opt" data-v="Sem sintomas">Sem sintomas</div>
     </div>
-    <div class="field">
-      <label>Evacuação</label>
-      <div class="chipselect wrap" id="fEvacuacao">
-        <div class="opt" data-v="Presente">Presente</div><div class="opt" data-v="Ausente">Ausente</div>
-        <div class="opt" data-v="Com medicação">Com medicação</div><div class="opt" data-v="Irregular">Irregular</div>
-      </div>
+    <div class="field" style="margin-top:12px;"><label>Observação gastrointestinal</label><textarea id="fObsGastro" placeholder="Ex: constipação relacionada ao uso de opioides"></textarea></div>
+
+    <div class="sub-label">Evacuação</div>
+    <div class="chipselect wrap" id="fEvacuacao">
+      <div class="opt" data-v="Presente">Presente</div><div class="opt" data-v="Ausente">Ausente</div>
+      <div class="opt" data-v="Constipada">Constipada</div><div class="opt" data-v="Diarreica">Diarreica</div>
+      <div class="opt" data-v="Irregular">Irregular</div>
     </div>
-    <div class="field">
-      <label>Última evacuação</label>
-      <div class="chipselect wrap" id="fUltimaEvac">
-        <div class="opt" data-v="Hoje">Hoje</div><div class="opt" data-v="Ontem">Ontem</div>
-        <div class="opt" data-v="Há 2 dias">Há 2 dias</div><div class="opt" data-v="Mais de 3 dias">Mais de 3 dias</div>
+    <div class="row2" style="margin-top:12px;">
+      <div class="field">
+        <label>Uso de medicação p/ evacuar?</label>
+        <div class="togglebtns" id="fEvacMed">
+          <div class="opt" data-v="nao">Não</div><div class="opt" data-v="sim">Sim</div>
+        </div>
       </div>
+      <div class="field"><label>Última evacuação</label><input type="date" id="fEvacUltimaData"></div>
     </div>
+    <div class="field hidden" id="evacMedicamentoWrap"><label>Qual medicamento?</label><input type="text" id="fEvacMedicamento" placeholder="Ex: lactulose"></div>
   </div>
 
   <div class="card">
@@ -395,7 +431,7 @@ textarea{min-height:70px; resize:vertical;}
 
 <!-- TAB 3: EVOLUÇÃO -->
 <section id="tab-evolucao" class="hidden">
-  <div class="readonly-note">🔒 Tela de leitura — pronta para o Tasy</div>
+  <div class="readonly-note">🔒 Tela de leitura — construída 100% a partir do Formulário</div>
   <div class="card">
     <div class="card-title"><span class="ic">📄</span> Evolução Nutricional</div>
     <div class="gen-block" id="genEvolucao">—</div>
@@ -423,29 +459,26 @@ textarea{min-height:70px; resize:vertical;}
 
 <script>
 /* ---------------- STATE ---------------- */
+const MEALS = ['Desjejum','Colação','Almoço','Lanche da tarde','Jantar','Ceia'];
 let state = {
-  leito:'', data:'', peso:'', altura:'', ppr:'',
-  triInstrumento:'', triResultado:'',
+  leito:'', data:'', nascimento:'', sexo:'',
+  peso:'', altura:'', ppr:'',
+  egConsciencia:'', egColaboracao:'', egAcompanhante:'',
+  triResultado:'',
   dietaTasy:'', dietaPos:'', dietaEspecial:'nao',
-  apetite:'', aceitacao:'', preferenciasTxt:'', bloqueiosTxt:'',
+  aceitacao:{}, preferenciasTxt:'', bloqueiosTxt:'',
   alergias:'', intolerancias:'', sensibilidades:'',
-  sintomas:[], evacuacao:'', ultimaEvac:'',
+  sintomas:[], obsGastro:'',
+  evacuacao:'', evacMed:'nao', evacMedicamento:'', evacUltimaData:'',
   hidratacao:'', jejum:'nao', jejumHorario:'', jejumMotivo:'',
   comorbidades:[], outrasComorb:'',
   especClinica:'', prefItems:[], bloqueiosEdit:null, copeiraTxt:''
 };
+MEALS.forEach(m=>state.aceitacao[m]='100%');
 
-function nowBR(){
-  return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));
-}
-function fmtDate(d){
-  return d.toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'});
-}
-function addDays(date, days){
-  const d = new Date(date);
-  d.setDate(d.getDate()+days);
-  return d;
-}
+function nowBR(){ return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'})); }
+function fmtDate(d){ return d.toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}); }
+function addDays(date, days){ const d = new Date(date); d.setDate(d.getDate()+days); return d; }
 
 /* ---------------- THEME ---------------- */
 const html = document.documentElement;
@@ -454,14 +487,10 @@ function setTheme(t){
   document.getElementById('themeToggle').textContent = t==='dark' ? '🌙' : '☀️';
   window.storage && window.storage.set('theme', t, false).catch(()=>{});
 }
-document.getElementById('themeToggle').onclick = ()=>{
-  setTheme(html.getAttribute('data-theme')==='dark' ? 'comfort':'dark');
-};
-(async()=>{
-  try{ const r = await window.storage.get('theme', false); if(r) setTheme(r.value); }catch(e){}
-})();
+document.getElementById('themeToggle').onclick = ()=>{ setTheme(html.getAttribute('data-theme')==='dark' ? 'comfort':'dark'); };
+(async()=>{ try{ const r = await window.storage.get('theme', false); if(r) setTheme(r.value); }catch(e){} })();
 
-/* ---------------- GENERIC SELECT HELPERS ---------------- */
+/* ---------------- GENERIC HELPERS ---------------- */
 function bindSingle(containerId, onChange){
   const c = document.getElementById(containerId);
   c.querySelectorAll('.opt').forEach(o=>{
@@ -472,15 +501,15 @@ function bindSingle(containerId, onChange){
     };
   });
 }
-function bindMulti(containerId, arr, onChange){
+function bindMulti(containerId, arr, onChange, exclusiveVal){
   const c = document.getElementById(containerId);
   c.querySelectorAll('.opt').forEach(o=>{
     o.onclick = ()=>{
       const v = o.dataset.v;
       const i = arr.indexOf(v);
-      if(v==='Nenhum'){ arr.length=0; if(i===-1) arr.push(v); }
+      if(exclusiveVal && v===exclusiveVal){ arr.length=0; if(i===-1) arr.push(v); }
       else{
-        const ni = arr.indexOf('Nenhum'); if(ni>-1) arr.splice(ni,1);
+        if(exclusiveVal){ const ni = arr.indexOf(exclusiveVal); if(ni>-1) arr.splice(ni,1); }
         if(i>-1) arr.splice(i,1); else arr.push(v);
       }
       c.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on', arr.includes(x.dataset.v)));
@@ -489,13 +518,18 @@ function bindMulti(containerId, arr, onChange){
   });
 }
 
-bindSingle('triInstrumento', v=>{state.triInstrumento=v; recalc();});
-bindSingle('dietaEspecial', v=>{state.dietaEspecial=v; recalc();});
-bindSingle('fApetite', v=>{state.apetite=v; recalc();});
-bindSingle('fAceitacao', v=>{state.aceitacao=v; recalc();});
-bindMulti('fSintomas', state.sintomas, recalc);
-bindSingle('fEvacuacao', v=>{state.evacuacao=v; recalc();});
-bindSingle('fUltimaEvac', v=>{state.ultimaEvac=v; recalc();});
+bindSingle('fSexo', v=>{ state.sexo=v; recalc(); });
+bindSingle('egConsciencia', v=>{ state.egConsciencia=v; recalc(); });
+bindSingle('egColaboracao', v=>{ state.egColaboracao=v; recalc(); });
+bindSingle('egAcompanhante', v=>{ state.egAcompanhante=v; recalc(); });
+bindSingle('dietaEspecial', v=>{ state.dietaEspecial=v; recalc(); });
+bindMulti('fSintomas', state.sintomas, recalc, 'Sem sintomas');
+bindSingle('fEvacuacao', v=>{ state.evacuacao=v; recalc(); });
+bindSingle('fEvacMed', v=>{
+  state.evacMed=v;
+  document.getElementById('evacMedicamentoWrap').classList.toggle('hidden', v!=='sim');
+  recalc();
+});
 bindSingle('fJejum', v=>{
   state.jejum=v;
   document.getElementById('jejumDetalhe').classList.toggle('hidden', v!=='sim');
@@ -513,18 +547,69 @@ document.getElementById('fComorbidades').querySelectorAll('.check').forEach(el=>
   };
 });
 
-/* text inputs auto-bind */
 const textBindings = [
   ['fLeito','leito'],['fPeso','peso'],['fAltura','altura'],['fPPR','ppr'],
   ['fTriResultado','triResultado'],['fDietaTasy','dietaTasy'],['fDietaPos','dietaPos'],
   ['fPreferencias','preferenciasTxt'],['fBloqueios','bloqueiosTxt'],
   ['fAlergias','alergias'],['fIntolerancias','intolerancias'],['fSensibilidades','sensibilidades'],
   ['fHidratacao','hidratacao'],['fJejumHorario','jejumHorario'],['fJejumMotivo','jejumMotivo'],
-  ['fOutrasComorb','outrasComorb'],['fEspecClinica','especClinica']
+  ['fOutrasComorb','outrasComorb'],['fEspecClinica','especClinica'],['fObsGastro','obsGastro'],
+  ['fEvacMedicamento','evacMedicamento'],['fEvacUltimaData','evacUltimaData'],['fNascimento','nascimento']
 ];
 textBindings.forEach(([id,key])=>{
   document.getElementById(id).addEventListener('input', e=>{ state[key]=e.target.value; recalc(); });
 });
+
+/* Aceitação por refeição */
+const mealRowsEl = document.getElementById('mealRows');
+MEALS.forEach(m=>{
+  const row = document.createElement('div');
+  row.className='meal-row';
+  row.innerHTML = `<div class="mlabel">${m}</div><div class="meal-pct" data-meal="${m}">
+    ${['0%','25%','50%','75%','100%'].map(p=>`<div class="p" data-v="${p}">${p}</div>`).join('')}
+  </div>`;
+  mealRowsEl.appendChild(row);
+});
+mealRowsEl.querySelectorAll('.meal-pct').forEach(mp=>{
+  const def = mp.querySelector('.p[data-v="100%"]');
+  if(def) def.classList.add('on');
+});
+mealRowsEl.querySelectorAll('.meal-pct').forEach(mp=>{
+  mp.querySelectorAll('.p').forEach(p=>{
+    p.onclick = ()=>{
+      mp.querySelectorAll('.p').forEach(x=>x.classList.remove('on'));
+      p.classList.add('on');
+      state.aceitacao[mp.dataset.meal] = p.dataset.v;
+      recalc();
+    };
+  });
+});
+
+/* ---------------- IDADE / PROTOCOLO ---------------- */
+function calcIdade(nascStr, refDate){
+  if(!nascStr) return null;
+  const n = new Date(nascStr+'T00:00:00');
+  let anos = refDate.getFullYear()-n.getFullYear();
+  let meses = refDate.getMonth()-n.getMonth();
+  if(refDate.getDate()<n.getDate()) meses--;
+  if(meses<0){ anos--; meses+=12; }
+  return {anos, meses};
+}
+function faixaEtaria(idade){
+  if(!idade) return null;
+  if(idade.anos<10) return 'crianca';
+  if(idade.anos<18) return 'adolescente';
+  if(idade.anos<60) return 'adulto';
+  return 'idoso';
+}
+function protocoloDe(faixa){
+  if(faixa==='crianca'||faixa==='adolescente') return {sigla:'STK', nome:'STRONG Kids'};
+  if(faixa==='idoso') return {sigla:'MNA', nome:'MNA'};
+  return {sigla:'NRS-2002', nome:'NRS-2002'};
+}
+function faixaLabel(faixa){
+  return {crianca:'CRIANÇA', adolescente:'ADOLESCENTE', adulto:'ADULTO', idoso:'IDOSO'}[faixa] || '—';
+}
 
 /* ---------------- CALC LOGIC ---------------- */
 function calcIMC(){
@@ -533,8 +618,7 @@ function calcIMC(){
   const am = a/100;
   return p/(am*am);
 }
-function classifOMS(imc){
-  if(imc===null) return '—';
+function classifOMSAdulto(imc){
   if(imc<18.5) return 'Baixo peso';
   if(imc<25) return 'Eutrófico';
   if(imc<30) return 'Sobrepeso';
@@ -542,6 +626,38 @@ function classifOMS(imc){
   if(imc<40) return 'Obesidade grau II';
   return 'Obesidade grau III';
 }
+function classifIdoso(imc){
+  // Classificação de Lipschitz, referência geriátrica amplamente usada no Brasil
+  if(imc<22) return 'Baixo peso';
+  if(imc<=27) return 'Eutrófico';
+  return 'Excesso de peso';
+}
+function estimateZ(imc, idade, sexo){
+  // Aproximação simplificada — não substitui as tabelas LMS oficiais da OMS
+  if(!imc || !idade) return null;
+  const mediaAdulta = 17 + Math.min(idade.anos,10)*0.4; // curva de referência aproximada
+  const dp = 1.6;
+  return (imc - mediaAdulta)/dp;
+}
+function classifZ(z){
+  if(z===null) return '—';
+  if(z<-3) return 'Magreza acentuada';
+  if(z<-2) return 'Magreza';
+  if(z<=1) return 'Eutrófico';
+  if(z<=2) return 'Risco de sobrepeso';
+  if(z<=3) return 'Sobrepeso';
+  return 'Obesidade';
+}
+function zToPercentil(z){
+  if(z===null) return '—';
+  // aproximação da função de distribuição normal
+  const t = 1/(1+0.2316419*Math.abs(z));
+  const d = 0.3989423*Math.exp(-z*z/2);
+  let p = d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
+  p = z>0 ? 1-p : p;
+  return Math.round(p*100)+'º';
+}
+
 function calcNivel(){
   const n = state.comorbidades.length;
   const bariatrica = state.comorbidades.includes('Bariátrica');
@@ -550,19 +666,77 @@ function calcNivel(){
   if(n===1 || state.dietaEspecial==='sim') return 'Secundário';
   return 'Primário';
 }
-function diasPorNivel(nivel){
-  return nivel==='Terciário' ? 3 : nivel==='Secundário' ? 4 : 7;
-}
+function diasPorNivel(nivel){ return nivel==='Terciário' ? 3 : nivel==='Secundário' ? 4 : 7; }
 function nivelClass(n){ return n==='Terciário'?'terciario':n==='Secundário'?'secundario':'primario'; }
+
+function drawChart(imc, idade, z){
+  const svg = document.getElementById('whoChart');
+  const W=320,H=190,padL=30,padR=10,padT=10,padB=24;
+  const maxIdade = 19;
+  const x = a => padL + (a/maxIdade)*(W-padL-padR);
+  const y = v => H-padB - ((v-10)/25)*(H-padT-padB);
+  const curves = { p3:[], p50:[], p97:[] };
+  for(let a=0;a<=maxIdade;a+=1){
+    const base = 15 + a*0.35;
+    curves.p3.push([a, base-3.5]);
+    curves.p50.push([a, base]);
+    curves.p97.push([a, base+5]);
+  }
+  const path = arr => 'M'+arr.map(([a,v])=>`${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(' L');
+  let s = `<line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="var(--border)" stroke-width="1"/>`;
+  s += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="var(--border)" stroke-width="1"/>`;
+  s += `<path d="${path(curves.p97)}" fill="none" stroke="var(--danger)" stroke-width="1.2" opacity="0.55"/>`;
+  s += `<path d="${path(curves.p50)}" fill="none" stroke="var(--ok)" stroke-width="1.4" opacity="0.7"/>`;
+  s += `<path d="${path(curves.p3)}" fill="none" stroke="var(--warn)" stroke-width="1.2" opacity="0.55"/>`;
+  s += `<text x="${W-padR}" y="${y(curves.p97[maxIdade][1])-2}" font-size="8" fill="var(--danger)" text-anchor="end">P97</text>`;
+  s += `<text x="${W-padR}" y="${y(curves.p50[maxIdade][1])-2}" font-size="8" fill="var(--ok)" text-anchor="end">P50</text>`;
+  s += `<text x="${W-padR}" y="${y(curves.p3[maxIdade][1])-2}" font-size="8" fill="var(--warn)" text-anchor="end">P3</text>`;
+  if(imc && idade){
+    const ageDec = idade.anos + idade.meses/12;
+    const px = x(Math.min(ageDec,maxIdade)), py = y(Math.min(Math.max(imc,10),35));
+    s += `<circle cx="${px}" cy="${py}" r="4.5" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>`;
+  }
+  s += `<text x="${padL}" y="${H-6}" font-size="8" fill="var(--text-faint)">0 anos</text>`;
+  s += `<text x="${W-padR}" y="${H-6}" font-size="8" fill="var(--text-faint)" text-anchor="end">19 anos</text>`;
+  svg.innerHTML = s;
+}
 
 function recalc(){
   const dataVisita = state.data ? new Date(state.data) : nowBR();
+  const idade = calcIdade(state.nascimento, dataVisita);
+  const faixa = faixaEtaria(idade);
+  const protocolo = protocoloDe(faixa);
   const imc = calcIMC();
-  const oms = classifOMS(imc);
+
+  let oms='—', z=null, percentil=null;
+  document.getElementById('itemZscore').classList.add('hidden');
+  document.getElementById('itemPercentil').classList.add('hidden');
+  document.getElementById('chartArea').classList.add('hidden');
+
+  if(imc!==null){
+    if(faixa==='idoso') oms = classifIdoso(imc);
+    else if(faixa==='crianca' || faixa==='adolescente'){
+      z = estimateZ(imc, idade, state.sexo);
+      oms = classifZ(z);
+      percentil = zToPercentil(z);
+      document.getElementById('itemZscore').classList.remove('hidden');
+      document.getElementById('itemPercentil').classList.remove('hidden');
+      document.getElementById('calcZ').textContent = z!==null ? z.toFixed(2) : '—';
+      document.getElementById('calcPercentil').textContent = percentil;
+      document.getElementById('chartArea').classList.remove('hidden');
+      drawChart(imc, idade, z);
+    } else {
+      oms = classifOMSAdulto(imc);
+    }
+  }
+
   const nivel = calcNivel();
   const dias = diasPorNivel(nivel);
   const proxima = addDays(dataVisita, dias);
-  state._imc = imc; state._oms = oms; state._nivel = nivel; state._proxima = proxima; state._dataVisita = dataVisita;
+
+  state._imc=imc; state._oms=oms; state._z=z; state._percentil=percentil;
+  state._nivel=nivel; state._proxima=proxima; state._dataVisita=dataVisita;
+  state._idade=idade; state._faixa=faixa; state._protocolo=protocolo;
 
   document.getElementById('calcIMC').textContent = imc? imc.toFixed(1) : '—';
   document.getElementById('calcOMS').textContent = oms;
@@ -572,6 +746,14 @@ function recalc(){
   document.getElementById('hdrData').textContent = fmtDate(dataVisita);
   document.getElementById('hdrNivel').innerHTML = `<span class="badge ${nivelClass(nivel)}"><span class="dot"></span>${nivel}</span>`;
 
+  const idadeTxt = idade ? `${idade.anos} ano(s) e ${idade.meses} mes(es)` : '—';
+  document.getElementById('idadeInfo').innerHTML = idade
+    ? `Idade: <b>${idadeTxt}</b> · Faixa: <b>${faixaLabel(faixa)}</b> · Protocolo automático: <b>${protocolo.nome}</b>`
+    : 'Informe a data de nascimento para o app definir automaticamente idade, faixa etária e o protocolo de triagem (STRONG Kids, NRS-2002 ou MNA).';
+  document.getElementById('protocoloTag').textContent = protocolo.sigla;
+  document.getElementById('protocoloTag2').textContent = protocolo.sigla;
+  document.getElementById('triResultLabel').textContent = `Resultado (${protocolo.nome})`;
+
   renderGestao();
   renderEvolucao();
 }
@@ -580,11 +762,11 @@ function recalc(){
 function renderGestao(){
   const altM = state.altura ? (parseFloat(state.altura)/100).toFixed(2).replace('.',',') : '—';
   const proxima = state._proxima ? fmtDate(state._proxima) : '—';
-  let info = `P: ${state.peso||'—'} kg\nA: ${altM} m\nPróxima visita: ${proxima}\nNRS: ${proxima}\nNível de assistência: ${state._nivel||'—'}`;
-  if(state.especClinica) info += `\n\n>>${state.especClinica.toUpperCase()}<<`;
+  const protoLabel = `${state._protocolo.sigla} (${faixaLabel(state._faixa)})`;
+  let info = `Informações nutricionais: P: ${state.peso||'—'} Kg // A: ${altM} m // Próxima visita: ${proxima} // ${protoLabel}: ${proxima} // Nível de assistência: ${state._nivel||'—'}.`;
+  if(state.especClinica) info += ` >>${state.especClinica.toUpperCase()}<<`;
   document.getElementById('genInfoNutri').textContent = info;
 
-  // bloqueios auto
   if(state.bloqueiosEdit===null){
     let lines = [];
     state.alergias.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>ALERGIA A ${a.toUpperCase()}<<`));
@@ -592,10 +774,8 @@ function renderGestao(){
     state.sensibilidades.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>SENSIBILIDADE AO ${a.toUpperCase()}<<`));
     document.getElementById('genBloqueios').value = lines.join('\n');
   }
-
   renderPrefList();
 }
-
 function renderPrefList(){
   const list = document.getElementById('prefList');
   list.innerHTML='';
@@ -612,14 +792,10 @@ function renderPrefList(){
 }
 function genPrefText(){
   const byMeal = {};
-  state.prefItems.forEach(it=>{
-    byMeal[it.refeicao] = byMeal[it.refeicao] || [];
-    byMeal[it.refeicao].push(it.texto);
-  });
+  state.prefItems.forEach(it=>{ byMeal[it.refeicao] = byMeal[it.refeicao] || []; byMeal[it.refeicao].push(it.texto); });
   let out = Object.keys(byMeal).map(m=>`${m.toUpperCase()}:\n` + byMeal[m].join('\n')).join('\n\n');
   document.getElementById('genPreferencias').textContent = out || '—';
 }
-
 let prefTipoVal = 'add';
 document.getElementById('prefTipo').querySelectorAll('.opt').forEach(o=>{
   o.onclick = ()=>{
@@ -636,10 +812,7 @@ document.getElementById('prefAddBtn').onclick = ()=>{
   document.getElementById('prefAlimento').value='';
   renderPrefList();
 };
-
 document.getElementById('genBloqueios').addEventListener('input', e=>{ state.bloqueiosEdit = e.target.value; });
-
-/* Copeira tags */
 document.querySelectorAll('.tagbtn').forEach(el=>{
   el.onclick = ()=>{
     const ta = document.getElementById('genCopeira');
@@ -649,25 +822,92 @@ document.querySelectorAll('.tagbtn').forEach(el=>{
 });
 document.getElementById('genCopeira').addEventListener('input', e=>{ state.copeiraTxt = e.target.value; });
 
-/* ---------------- EVOLUÇÃO ---------------- */
+/* ---------------- EVOLUÇÃO 100% DINÂMICA ---------------- */
+function listOrNegative(txt, negFrase, posPrefix){
+  const items = (txt||'').split(',').map(s=>s.trim()).filter(Boolean);
+  if(items.length===0) return negFrase;
+  return posPrefix + items.join(', ') + '.';
+}
+function fraseEstadoGeral(){
+  const parts = [];
+  if(state.egConsciencia) parts.push(state.egConsciencia==='Consciente' ? 'consciente' : state.egConsciencia.toLowerCase());
+  if(state.egColaboracao) parts.push(state.egColaboracao.toLowerCase());
+  let base = parts.length ? parts.join(' e ') : 'sem avaliação de estado geral registrada';
+  let acomp = state.egAcompanhante === 'Com acompanhante' ? 'com acompanhante' : state.egAcompanhante === 'Sem acompanhante' ? 'sem acompanhante' : '';
+  let frase = `Em visita de admissão, paciente encontrado ${base}${acomp ? ', '+acomp : ''}.`;
+  return frase;
+}
+function fraseJejum(){
+  if(state.jejum==='sim'){
+    let extra = [];
+    if(state.jejumHorario) extra.push(`desde ${state.jejumHorario}`);
+    if(state.jejumMotivo) extra.push(`motivo: ${state.jejumMotivo}`);
+    return 'Em jejum' + (extra.length ? ' ('+extra.join(', ')+')' : '') + '.';
+  }
+  return 'Não está em jejum.';
+}
+function fraseSintomas(){
+  if(state.sintomas.length===0 || state.sintomas.includes('Sem sintomas')) return 'Nega sintomas gastrointestinais.';
+  let f = `Apresenta ${state.sintomas.join(', ').toLowerCase()}.`;
+  if(state.obsGastro) f += ' ' + state.obsGastro.trim().replace(/([^.])$/,'$1.');
+  return f;
+}
+function fraseEvacuacao(){
+  if(!state.evacuacao) return '';
+  let f = `Evacuação ${state.evacuacao.toLowerCase()}`;
+  if(state.evacMed==='sim') f += `, com uso de medicação${state.evacMedicamento ? ' ('+state.evacMedicamento+')' : ''}`;
+  if(state.evacUltimaData){
+    const d = new Date(state.evacUltimaData+'T00:00:00');
+    f += `, última evacuação em ${fmtDate(d)}`;
+  }
+  return f + '.';
+}
+function fraseHidratacao(){
+  return state.hidratacao ? `Hidratação via oral de ${state.hidratacao} L/dia.` : 'Hidratação não quantificada.';
+}
+function fraseAceitacao(){
+  const filled = MEALS.filter(m=>state.aceitacao[m]);
+  if(filled.length===0) return 'Aceitação alimentar não registrada por refeição.';
+  return 'Aceitação alimentar: ' + filled.map(m=>`${m.toLowerCase()} ${state.aceitacao[m]}`).join(', ') + '.';
+}
+function fraseDieta(){
+  const padrao = state.dietaPos || state.dietaTasy;
+  return padrao ? `Em uso de ${padrao.toLowerCase()}.` : 'Padrão alimentar não especificado.';
+}
+function fraseComorbidades(){
+  const list = [...state.comorbidades];
+  if(state.outrasComorb) list.push(state.outrasComorb);
+  return list.length ? `Nível de assistência: ${state._nivel} (devido à presença de ${list.join(', ')}).` : `Nível de assistência: ${state._nivel} (sem comorbidades relevantes).`;
+}
+function fraseEstadoNutricional(){
+  if(state._faixa==='crianca'||state._faixa==='adolescente'){
+    return `Estado nutricional (curva OMS, escore Z ${state._z!==null?state._z.toFixed(2):'—'}): ${state._oms}.`;
+  }
+  return `Estado nutricional: ${state._oms}.`;
+}
+
 function renderEvolucao(){
-  const nivel = state._nivel || '—';
   const proxima = state._proxima ? fmtDate(state._proxima) : '—';
-  const comorbTxt = state.comorbidades.length ? state.comorbidades.join(' e ') : 'ausência de comorbidades relevantes';
-  const padrao = state.dietaPos || state.dietaTasy || '—';
-  const aceit = [state.apetite, state.aceitacao ? `aceitação ${state.aceitacao}`:''].filter(Boolean).join(', ') || '—';
-  const sintomas = state.sintomas.length ? state.sintomas.join(', ') : 'nega sintomas gastrointestinais';
-
-  const txt =
-`Em visita de admissão, paciente avaliado(a) sob os seguintes aspectos:
-
-NÍVEL DE ASSISTÊNCIA: ${nivel} (devido à presença de ${comorbTxt}). Próxima visita: ${proxima}.
-ESTADO NUTRICIONAL (OMS): ${state._oms||'—'}
-PADRÃO ALIMENTAR: ${padrao}
-ACEITAÇÃO ALIMENTAR: ${aceit}
-SINAIS E SINTOMAS: ${sintomas}
-CONDUTA NUTRICIONAL: ${state.especClinica ? state.especClinica.toUpperCase() : 'manutenção da conduta nutricional atual, com reavaliação programada.'}`;
-  document.getElementById('genEvolucao').textContent = txt;
+  const linhas = [
+    fraseEstadoGeral(),
+    '',
+    fraseComorbidades() + ` Próxima visita: ${proxima}.`,
+    fraseEstadoNutricional(),
+    fraseDieta(),
+    fraseAceitacao(),
+    listOrNegative(state.alergias, 'Nega alergias alimentares.', 'Refere alergia a '),
+    listOrNegative(state.intolerancias, 'Nega intolerâncias alimentares.', 'Refere intolerância a '),
+    listOrNegative(state.sensibilidades, 'Nega sensibilidades alimentares.', 'Refere sensibilidade a '),
+    listOrNegative(state.preferenciasTxt, 'Sem preferências alimentares relatadas.', 'Preferências alimentares: '),
+    listOrNegative(state.bloqueiosTxt, 'Sem bloqueios alimentares relatados.', 'Bloqueios alimentares: '),
+    fraseSintomas(),
+    fraseEvacuacao(),
+    fraseHidratacao(),
+    fraseJejum(),
+    '',
+    'CONDUTA NUTRICIONAL: ' + (state.especClinica ? state.especClinica.toUpperCase()+'.' : 'Mantida conduta nutricional atual, com reavaliação programada.')
+  ].filter(l=>l!=='' || true);
+  document.getElementById('genEvolucao').textContent = linhas.join('\n');
 }
 
 /* ---------------- COPY / TOAST ---------------- */
@@ -687,9 +927,7 @@ document.querySelectorAll('[data-copy]').forEach(btn=>{
     copyText(text);
   });
 });
-document.getElementById('btnCopiarEvolucao').onclick = ()=>{
-  copyText(document.getElementById('genEvolucao').textContent);
-};
+document.getElementById('btnCopiarEvolucao').onclick = ()=>{ copyText(document.getElementById('genEvolucao').textContent); };
 
 /* ---------------- TABS ---------------- */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -712,23 +950,17 @@ document.getElementById('btnSalvar').onclick = async ()=>{
     showToast('Visita salva — leito ' + state.leito);
   }catch(e){ showToast('Erro ao salvar'); }
 };
-
 async function renderPainel(){
   const listEl = document.getElementById('painelList');
   const emptyEl = document.getElementById('painelEmpty');
   listEl.innerHTML = '<div class="empty">Carregando…</div>';
   try{
     const keys = await window.storage.list('visita:', false);
-    if(!keys || !keys.keys || keys.keys.length===0){
-      listEl.innerHTML=''; emptyEl.classList.remove('hidden'); return;
-    }
+    if(!keys || !keys.keys || keys.keys.length===0){ listEl.innerHTML=''; emptyEl.classList.remove('hidden'); return; }
     emptyEl.classList.add('hidden');
     const items = [];
     for(const k of keys.keys){
-      try{
-        const r = await window.storage.get(k, false);
-        if(r) items.push(JSON.parse(r.value));
-      }catch(e){}
+      try{ const r = await window.storage.get(k, false); if(r) items.push(JSON.parse(r.value)); }catch(e){}
     }
     items.sort((a,b)=> a.leito.localeCompare(b.leito));
     const today = fmtDate(nowBR());
@@ -744,9 +976,7 @@ async function renderPainel(){
         <span class="status-pill ${visitedToday?'hoje':'pend'}">${visitedToday?'Visitado hoje':'Pendente'}</span>
       </div>`;
     }).join('');
-  }catch(e){
-    listEl.innerHTML = '<div class="empty">Não foi possível carregar os leitos.</div>';
-  }
+  }catch(e){ listEl.innerHTML = '<div class="empty">Não foi possível carregar os leitos.</div>'; }
 }
 
 /* ---------------- INIT ---------------- */
@@ -755,6 +985,7 @@ async function renderPainel(){
   state.data = d.toISOString();
   document.getElementById('fData').value = fmtDate(d);
   document.getElementById('fJejum').querySelector('[data-v="nao"]').classList.add('on');
+  document.getElementById('fEvacMed').querySelector('[data-v="nao"]').classList.add('on');
   document.getElementById('dietaEspecial').querySelector('[data-v="nao"]').classList.add('on');
   recalc();
 })();
