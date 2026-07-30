@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Nutri Hospital</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=general-sans@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0D14;
+  --bg-grad: radial-gradient(circle at 15% -10%, #1B2340 0%, transparent 45%), radial-gradient(circle at 100% 0%, #1A1030 0%, transparent 40%), #0A0D14;
+  --surface: rgba(255,255,255,0.045);
+  --surface-strong: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.09);
+  --border-soft: rgba(255,255,255,0.05);
+  --text: #EDEFF6;
+  --text-dim: #9BA3B8;
+  --text-faint: #6B7286;
+  --accent: #7C9CFF;
+  --accent2: #B98CFF;
+  --accent-grad: linear-gradient(135deg,#6C8EFF 0%, #A97CFF 100%);
+  --accent-soft: rgba(124,156,255,0.14);
+  --ok: #5FE0A6;
+  --warn: #F5C563;
+  --danger: #FF7A85;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.35);
+  --font: 'General Sans', -apple-system, BlinkMacSystemFont, 'Inter Tight', 'Segoe UI', sans-serif;
+}
+html[data-theme="comfort"]{
+  --bg:#F3ECD8;
+  --bg-grad: radial-gradient(circle at 15% -10%, #F8E9CE 0%, transparent 45%), #F3ECD8;
+  --surface: rgba(70,50,20,0.045);
+  --surface-strong: rgba(70,50,20,0.075);
+  --border: rgba(70,50,20,0.12);
+  --border-soft: rgba(70,50,20,0.07);
+  --text: #3A3020;
+  --text-dim: #7A6D52;
+  --text-faint: #9C8F72;
+  --accent: #8A5A2E;
+  --accent2: #B9793C;
+  --accent-grad: linear-gradient(135deg,#B9793C 0%, #8A5A2E 100%);
+  --accent-soft: rgba(138,90,46,0.12);
+  --ok: #4E8F63;
+  --warn: #B5842A;
+  --danger: #B5482F;
+  --shadow: 0 8px 28px rgba(90,70,30,0.14);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+body{margin:0; background:var(--bg-grad); background-attachment:fixed; color:var(--text); font-family:var(--font); min-height:100vh; padding-bottom:92px; transition:background .3s,color .3s;}
+h1,h2,h3{font-weight:600; margin:0;}
+button{font-family:var(--font);}
+input,select,textarea{font-family:var(--font); color:var(--text); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:11px 12px; font-size:15px; width:100%; outline:none; transition:border .2s, background .2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent); background:var(--surface-strong);}
+input::placeholder,textarea::placeholder{color:var(--text-faint);}
+label{display:block; font-size:12.5px; color:var(--text-dim); margin-bottom:6px; letter-spacing:.02em;}
+.field{margin-bottom:14px;}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+
+/* Header */
+header{position:sticky; top:0; z-index:30; backdrop-filter:blur(18px); background:rgba(10,13,20,0.55); border-bottom:1px solid var(--border-soft); padding:14px 16px 12px;}
+html[data-theme="comfort"] header{background:rgba(243,236,216,0.7);}
+.hdr-top{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.brand{display:flex; align-items:center; gap:9px;}
+.brand-mark{width:30px; height:30px; border-radius:9px; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 0 18px var(--accent-soft);}
+.brand-name{font-size:15.5px; font-weight:600; letter-spacing:-.01em;}
+.brand-sub{font-size:10.5px; color:var(--text-faint); margin-top:-2px;}
+.theme-toggle{width:38px; height:38px; border-radius:12px; border:1px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;}
+.hdr-meta{display:flex; gap:8px; margin-top:12px;}
+.chip{flex:1; background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:8px 10px;}
+.chip .k{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint);}
+.chip .v{font-size:14.5px; font-weight:600; margin-top:1px;}
+.badge{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:20px; font-size:11.5px; font-weight:600;}
+.badge.primario{background:rgba(95,224,166,0.15); color:var(--ok);}
+.badge.secundario{background:rgba(245,197,99,0.15); color:var(--warn);}
+.badge.terciario{background:rgba(255,122,133,0.15); color:var(--danger);}
+.dot{width:7px; height:7px; border-radius:50%; background:currentColor;}
+
+main{max-width:640px; margin:0 auto; padding:16px;}
+.card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow);}
+.card-title{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; margin-bottom:14px; color:var(--text);}
+.card-title .ic{font-size:15px;}
+.section-label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); margin:0 0 10px 2px;}
+
+.chipselect{display:flex; flex-wrap:wrap; gap:8px;}
+.chipselect .opt{padding:9px 14px; border-radius:11px; border:1px solid var(--border); background:var(--surface); font-size:13.5px; cursor:pointer; color:var(--text-dim); transition:.15s;}
+.chipselect .opt.on{background:var(--accent-grad); color:#0A0D14; border-color:transparent; font-weight:600;}
+html[data-theme="comfort"] .chipselect .opt.on{color:#fff;}
+.chipselect.grid3{display:grid; grid-template-columns:1fr 1fr 1fr;}
+.chipselect.wrap .opt{flex:0 0 auto;}
+
+.togglebtns{display:flex; gap:8px;}
+.togglebtns .opt{flex:1; text-align:center; padding:10px; border-radius:11px; border:1px solid var(--border); background:var(--surface); font-size:13.5px; cursor:pointer; color:var(--text-dim);}
+.togglebtns .opt.on{background:var(--accent-grad); color:#0A0D14; font-weight:600; border-color:transparent;}
+html[data-theme="comfort"] .togglebtns .opt.on{color:#fff;}
+
+.check-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.check{display:flex; align-items:center; gap:9px; padding:10px 11px; border-radius:11px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-size:13.5px; color:var(--text-dim);}
+.check.on{border-color:var(--accent); background:var(--accent-soft); color:var(--text); font-weight:500;}
+.check .box{width:16px; height:16px; border-radius:5px; border:1.5px solid var(--text-faint); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px;}
+.check.on .box{background:var(--accent-grad); border-color:transparent; color:#fff;}
+
+.calc-banner{display:flex; gap:10px; align-items:center; background:var(--accent-soft); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:14px;}
+.calc-banner .num{font-size:22px; font-weight:700; line-height:1;}
+.calc-banner .lbl{font-size:11px; color:var(--text-dim); margin-top:2px;}
+.calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
+.calc-item{background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:10px 12px;}
+.calc-item .k{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+.calc-item .v{font-size:15px; font-weight:600; margin-top:2px;}
+
+/* Tabs nav */
+nav.tabbar{position:fixed; bottom:0; left:0; right:0; z-index:40; backdrop-filter:blur(20px); background:rgba(10,13,20,0.72); border-top:1px solid var(--border-soft); display:flex; padding:8px 10px calc(8px + env(safe-area-inset-bottom));}
+html[data-theme="comfort"] nav.tabbar{background:rgba(243,236,216,0.85);}
+nav.tabbar button{flex:1; background:none; border:none; color:var(--text-faint); display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; padding:6px 2px; border-radius:12px; cursor:pointer;}
+nav.tabbar button .ic{font-size:19px;}
+nav.tabbar button.active{color:var(--accent);}
+
+.gen-block{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:13px 14px; font-size:13.5px; line-height:1.75; white-space:pre-wrap; color:var(--text); font-variant-numeric:tabular-nums; margin-bottom:10px; min-height:40px;}
+.copybtn{display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:11px; border-radius:11px; border:none; background:var(--accent-grad); color:#fff; font-weight:600; font-size:13.5px; cursor:pointer;}
+html[data-theme="dark"] .copybtn{color:#0A0D14;}
+.editbtn{background:none; border:1px solid var(--border); color:var(--text-dim); padding:8px 12px; border-radius:10px; font-size:12px; cursor:pointer; margin-bottom:10px;}
+
+.tagrow{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px;}
+.tagbtn{padding:7px 12px; border-radius:9px; border:1px solid var(--border); background:var(--surface); font-size:12px; color:var(--text-dim); cursor:pointer;}
+
+.addbar{display:flex; gap:8px; margin-top:10px;}
+.addbar input{flex:1;}
+.addbar button{width:44px; border-radius:11px; border:none; background:var(--accent-grad); color:#fff; font-size:19px; cursor:pointer;}
+html[data-theme="dark"] .addbar button{color:#0A0D14;}
+.listrow{display:flex; align-items:center; justify-content:space-between; background:var(--surface); border:1px solid var(--border-soft); border-radius:10px; padding:9px 12px; margin-bottom:7px; font-size:13px;}
+.listrow .rm{color:var(--text-faint); cursor:pointer; font-size:15px; padding:0 4px;}
+
+.leito-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border-soft); border-radius:14px; padding:13px 14px; margin-bottom:10px; cursor:pointer;}
+.leito-num{width:44px; height:44px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--accent);}
+.leito-info{flex:1;}
+.leito-info .l1{font-size:14px; font-weight:600;}
+.leito-info .l2{font-size:11.5px; color:var(--text-faint); margin-top:2px;}
+.status-pill{font-size:10.5px; padding:4px 9px; border-radius:20px; font-weight:600;}
+.status-pill.pend{background:rgba(255,122,133,0.15); color:var(--danger);}
+.status-pill.hoje{background:rgba(95,224,166,0.15); color:var(--ok);}
+
+.toast{position:fixed; bottom:96px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface-strong); backdrop-filter:blur(14px); border:1px solid var(--border); color:var(--text); padding:11px 20px; border-radius:30px; font-size:13px; font-weight:500; opacity:0; transition:.25s; z-index:60; box-shadow:var(--shadow); display:flex; align-items:center; gap:8px;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+.empty{text-align:center; padding:40px 20px; color:var(--text-faint); font-size:13.5px;}
+.newbtn{position:fixed; right:16px; bottom:96px; width:52px; height:52px; border-radius:16px; background:var(--accent-grad); border:none; color:#fff; font-size:24px; box-shadow:0 6px 24px var(--accent-soft); cursor:pointer; z-index:35;}
+html[data-theme="dark"] .newbtn{color:#0A0D14;}
+textarea{min-height:70px; resize:vertical;}
+.hidden{display:none !important;}
+.readonly-note{font-size:11px; color:var(--text-faint); margin-top:-9px; margin-bottom:14px; display:flex; align-items:center; gap:5px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <div class="brand">
+      <div class="brand-mark">🏥</div>
+      <div>
+        <div class="brand-name">Nutri Hospital</div>
+        <div class="brand-sub">Assistente de visita nutricional</div>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+  </div>
+  <div class="hdr-meta">
+    <div class="chip"><div class="k">Leito</div><div class="v" id="hdrLeito">—</div></div>
+    <div class="chip"><div class="k">Data da visita</div><div class="v" id="hdrData">—</div></div>
+    <div class="chip"><div class="k">Nível</div><div class="v" id="hdrNivel"><span class="badge primario"><span class="dot"></span>—</span></div></div>
+  </div>
+</header>
+
+<main>
+
+<!-- TAB 1 : FORMULÁRIO -->
+<section id="tab-formulario">
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🛏️</span> Identificação</div>
+    <div class="row2">
+      <div class="field">
+        <label>Leito (3 dígitos)</label>
+        <input type="text" id="fLeito" maxlength="3" inputmode="numeric" placeholder="317">
+      </div>
+      <div class="field">
+        <label>Data da visita</label>
+        <input type="text" id="fData" disabled>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">📏</span> Antropometria</div>
+    <div class="row2">
+      <div class="field"><label>Peso (kg)</label><input type="number" step="0.1" id="fPeso" placeholder="72"></div>
+      <div class="field"><label>Altura (cm)</label><input type="number" id="fAltura" placeholder="170"></div>
+    </div>
+    <div class="field"><label>PPR (perda de peso recente)</label><input type="text" id="fPPR" placeholder="Ex: 3kg em 30 dias, ou 'nega'"></div>
+    <div class="calc-grid">
+      <div class="calc-item"><div class="k">IMC</div><div class="v" id="calcIMC">—</div></div>
+      <div class="calc-item"><div class="k">Estado nutricional (OMS)</div><div class="v" id="calcOMS">—</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">📋</span> Triagem</div>
+    <div class="field">
+      <label>Instrumento</label>
+      <div class="chipselect" id="triInstrumento">
+        <div class="opt" data-v="STRONG Kids">STRONG Kids</div>
+        <div class="opt" data-v="NRS-2002">NRS-2002</div>
+        <div class="opt" data-v="MNA">MNA</div>
+      </div>
+    </div>
+    <div class="field"><label>Resultado</label><input type="text" id="fTriResultado" placeholder="Ex: Baixo risco / 3 pontos"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🍽️</span> Dieta</div>
+    <div class="field"><label>Dieta prescrita no Tasy</label><input type="text" id="fDietaTasy" placeholder="Ex: Dieta geral"></div>
+    <div class="field"><label>Dieta após avaliação nutricional</label><input type="text" id="fDietaPos" placeholder="Ex: Dieta hipossódica"></div>
+    <div class="field">
+      <label>Dieta especial?</label>
+      <div class="togglebtns" id="dietaEspecial">
+        <div class="opt" data-v="nao">Não</div>
+        <div class="opt" data-v="sim">Sim</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🍴</span> Alimentação</div>
+    <div class="row2">
+      <div class="field">
+        <label>Apetite</label>
+        <div class="chipselect wrap" id="fApetite">
+          <div class="opt" data-v="Preservado">Preservado</div>
+          <div class="opt" data-v="Reduzido">Reduzido</div>
+          <div class="opt" data-v="Ausente">Ausente</div>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Aceitação</label>
+      <div class="chipselect grid3" id="fAceitacao">
+        <div class="opt" data-v="&lt;25%">&lt;25%</div><div class="opt" data-v="25%">25%</div><div class="opt" data-v="50%">50%</div>
+        <div class="opt" data-v="75%">75%</div><div class="opt" data-v="100%">100%</div>
+      </div>
+    </div>
+    <div class="field"><label>Preferências</label><input type="text" id="fPreferencias" placeholder="Ex: água de coco, suco de manga"></div>
+    <div class="field"><label>Bloqueios alimentares (não gosta)</label><input type="text" id="fBloqueios" placeholder="Ex: peixe, quiabo"></div>
+    <div class="field"><label>Alergias</label><input type="text" id="fAlergias" placeholder="Ex: ovo"></div>
+    <div class="field"><label>Intolerâncias</label><input type="text" id="fIntolerancias" placeholder="Ex: lactose"></div>
+    <div class="field"><label>Sensibilidades</label><input type="text" id="fSensibilidades" placeholder="Ex: coentro"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">💩</span> Gastrointestinal</div>
+    <div class="field">
+      <label>Sintomas intestinais</label>
+      <div class="chipselect wrap" id="fSintomas">
+        <div class="opt" data-v="Nenhum">Nenhum</div><div class="opt" data-v="Estufamento">Estufamento</div>
+        <div class="opt" data-v="Gases">Gases</div><div class="opt" data-v="Constipação">Constipação</div>
+        <div class="opt" data-v="Diarreia">Diarreia</div><div class="opt" data-v="Náusea">Náusea</div>
+        <div class="opt" data-v="Vômito">Vômito</div><div class="opt" data-v="Dor abdominal">Dor abdominal</div>
+        <div class="opt" data-v="Refluxo">Refluxo</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Evacuação</label>
+      <div class="chipselect wrap" id="fEvacuacao">
+        <div class="opt" data-v="Presente">Presente</div><div class="opt" data-v="Ausente">Ausente</div>
+        <div class="opt" data-v="Com medicação">Com medicação</div><div class="opt" data-v="Irregular">Irregular</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Última evacuação</label>
+      <div class="chipselect wrap" id="fUltimaEvac">
+        <div class="opt" data-v="Hoje">Hoje</div><div class="opt" data-v="Ontem">Ontem</div>
+        <div class="opt" data-v="Há 2 dias">Há 2 dias</div><div class="opt" data-v="Mais de 3 dias">Mais de 3 dias</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">💧</span> Hidratação e jejum</div>
+    <div class="row2">
+      <div class="field"><label>Hidratação (L/dia)</label><input type="number" step="0.1" id="fHidratacao" placeholder="1.5"></div>
+      <div class="field">
+        <label>Jejum</label>
+        <div class="togglebtns" id="fJejum">
+          <div class="opt" data-v="nao">Não</div><div class="opt" data-v="sim">Sim</div>
+        </div>
+      </div>
+    </div>
+    <div id="jejumDetalhe" class="hidden">
+      <div class="row2">
+        <div class="field"><label>Horário</label><input type="time" id="fJejumHorario"></div>
+        <div class="field"><label>Motivo</label><input type="text" id="fJejumMotivo" placeholder="Ex: exame"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🩺</span> Comorbidades</div>
+    <div class="check-grid" id="fComorbidades">
+      <div class="check" data-v="HAS"><span class="box"></span>HAS</div>
+      <div class="check" data-v="DM"><span class="box"></span>DM</div>
+      <div class="check" data-v="Dislipidemia"><span class="box"></span>Dislipidemia</div>
+      <div class="check" data-v="IRC"><span class="box"></span>IRC</div>
+      <div class="check" data-v="DRC"><span class="box"></span>DRC</div>
+      <div class="check" data-v="ICC"><span class="box"></span>ICC</div>
+      <div class="check" data-v="DPOC"><span class="box"></span>DPOC</div>
+      <div class="check" data-v="Neoplasia"><span class="box"></span>Neoplasia</div>
+      <div class="check" data-v="Disfagia"><span class="box"></span>Disfagia</div>
+      <div class="check" data-v="Bariátrica"><span class="box"></span>Bariátrica</div>
+      <div class="check" data-v="Cirurgia de grande porte"><span class="box"></span>Cirurgia grande porte</div>
+    </div>
+    <div class="field" style="margin-top:10px;"><label>Outras</label><input type="text" id="fOutrasComorb" placeholder="Especificar"></div>
+  </div>
+
+  <div class="calc-banner">
+    <div style="flex:1;">
+      <div class="lbl">Nível de assistência (automático)</div>
+      <div class="num" id="calcNivel">Primário</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="lbl">Próxima visita</div>
+      <div class="num" id="calcProxima" style="font-size:16px;">—</div>
+    </div>
+  </div>
+
+  <button class="copybtn" id="btnSalvar">💾 Salvar visita</button>
+</section>
+
+<!-- TAB 2: GESTÃO DA NUTRIÇÃO -->
+<section id="tab-gestao" class="hidden">
+  <div class="readonly-note">🔒 Gerado automaticamente a partir do Formulário da Visita</div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">📊</span> Informações Nutricionais</div>
+    <div class="gen-block" id="genInfoNutri">—</div>
+    <div class="field"><label>Especificação clínica</label><input type="text" id="fEspecClinica" placeholder="Ex: dieta hipogordurosa"></div>
+    <button class="copybtn" data-copy="genInfoNutri">📋 Copiar</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🍽️</span> Preferências</div>
+    <div class="row2">
+      <select id="prefRefeicao">
+        <option>Desjejum</option><option>Colação</option><option>Almoço</option>
+        <option>Lanche</option><option>Jantar</option><option>Ceia</option>
+      </select>
+      <div class="togglebtns" id="prefTipo">
+        <div class="opt on" data-v="add">Adicionar</div>
+        <div class="opt" data-v="pref">Preferência</div>
+      </div>
+    </div>
+    <div class="addbar">
+      <input type="text" id="prefAlimento" placeholder="Ex: água de coco">
+      <button id="prefAddBtn">+</button>
+    </div>
+    <div id="prefList" style="margin-top:10px;"></div>
+    <div class="gen-block" id="genPreferencias" style="margin-top:6px;">—</div>
+    <button class="copybtn" data-copy="genPreferencias">📋 Copiar</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🚫</span> Bloqueios</div>
+    <textarea id="genBloqueios" class="gen-block" style="width:100%; font-family:var(--font);"></textarea>
+    <button class="copybtn" data-copy="genBloqueios" style="margin-top:10px;">📋 Copiar</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">👩🏻‍🍳</span> Observações para Copeira</div>
+    <div class="tagrow">
+      <div class="tagbtn" data-txt="ADICIONAR 3 SACHÊS DE SAL">+ Sal (3 sachês)</div>
+      <div class="tagbtn" data-txt="SEM GELO">Sem gelo</div>
+      <div class="tagbtn" data-txt="SERVIR EM TEMPERATURA AMBIENTE">Temp. ambiente</div>
+      <div class="tagbtn" data-txt="AQUECER REFEIÇÃO">Aquecer</div>
+    </div>
+    <div class="tagrow">
+      <div class="tagbtn" data-txt="VIP">🌟 VIP</div>
+      <div class="tagbtn" data-txt="RECOMENDADO">👍 Recomendado</div>
+      <div class="tagbtn" data-txt="RISCO PSIQUIÁTRICO">⚠️ Risco psiquiátrico</div>
+      <div class="tagbtn" data-txt="BARIÁTRICA">🔵 Bariátrica</div>
+    </div>
+    <textarea id="genCopeira" class="gen-block" style="width:100%; font-family:var(--font);" placeholder="Toque nos atalhos acima para adicionar..."></textarea>
+    <button class="copybtn" data-copy="genCopeira" style="margin-top:10px;">📋 Copiar</button>
+  </div>
+</section>
+
+<!-- TAB 3: EVOLUÇÃO -->
+<section id="tab-evolucao" class="hidden">
+  <div class="readonly-note">🔒 Tela de leitura — pronta para o Tasy</div>
+  <div class="card">
+    <div class="card-title"><span class="ic">📄</span> Evolução Nutricional</div>
+    <div class="gen-block" id="genEvolucao">—</div>
+    <button class="copybtn" id="btnCopiarEvolucao">📋 Copiar Evolução</button>
+  </div>
+</section>
+
+<!-- TAB 4: PAINEL -->
+<section id="tab-painel" class="hidden">
+  <div class="section-label">Leitos do plantão</div>
+  <div id="painelList"></div>
+  <div class="empty hidden" id="painelEmpty">Nenhuma visita salva ainda.<br>Preencha o formulário e toque em "Salvar visita".</div>
+</section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<nav class="tabbar">
+  <button class="tab-btn active" data-tab="formulario"><span class="ic">📝</span>Formulário</button>
+  <button class="tab-btn" data-tab="gestao"><span class="ic">🥗</span>Gestão</button>
+  <button class="tab-btn" data-tab="evolucao"><span class="ic">📄</span>Evolução</button>
+  <button class="tab-btn" data-tab="painel"><span class="ic">🏥</span>Painel</button>
+</nav>
+
+<script>
+/* ---------------- STATE ---------------- */
+let state = {
+  leito:'', data:'', peso:'', altura:'', ppr:'',
+  triInstrumento:'', triResultado:'',
+  dietaTasy:'', dietaPos:'', dietaEspecial:'nao',
+  apetite:'', aceitacao:'', preferenciasTxt:'', bloqueiosTxt:'',
+  alergias:'', intolerancias:'', sensibilidades:'',
+  sintomas:[], evacuacao:'', ultimaEvac:'',
+  hidratacao:'', jejum:'nao', jejumHorario:'', jejumMotivo:'',
+  comorbidades:[], outrasComorb:'',
+  especClinica:'', prefItems:[], bloqueiosEdit:null, copeiraTxt:''
+};
+
+function nowBR(){
+  return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'}));
+}
+function fmtDate(d){
+  return d.toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'});
+}
+function addDays(date, days){
+  const d = new Date(date);
+  d.setDate(d.getDate()+days);
+  return d;
+}
+
+/* ---------------- THEME ---------------- */
+const html = document.documentElement;
+function setTheme(t){
+  html.setAttribute('data-theme', t);
+  document.getElementById('themeToggle').textContent = t==='dark' ? '🌙' : '☀️';
+  window.storage && window.storage.set('theme', t, false).catch(()=>{});
+}
+document.getElementById('themeToggle').onclick = ()=>{
+  setTheme(html.getAttribute('data-theme')==='dark' ? 'comfort':'dark');
+};
+(async()=>{
+  try{ const r = await window.storage.get('theme', false); if(r) setTheme(r.value); }catch(e){}
+})();
+
+/* ---------------- GENERIC SELECT HELPERS ---------------- */
+function bindSingle(containerId, onChange){
+  const c = document.getElementById(containerId);
+  c.querySelectorAll('.opt').forEach(o=>{
+    o.onclick = ()=>{
+      c.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
+      o.classList.add('on');
+      onChange(o.dataset.v);
+    };
+  });
+}
+function bindMulti(containerId, arr, onChange){
+  const c = document.getElementById(containerId);
+  c.querySelectorAll('.opt').forEach(o=>{
+    o.onclick = ()=>{
+      const v = o.dataset.v;
+      const i = arr.indexOf(v);
+      if(v==='Nenhum'){ arr.length=0; if(i===-1) arr.push(v); }
+      else{
+        const ni = arr.indexOf('Nenhum'); if(ni>-1) arr.splice(ni,1);
+        if(i>-1) arr.splice(i,1); else arr.push(v);
+      }
+      c.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on', arr.includes(x.dataset.v)));
+      onChange();
+    };
+  });
+}
+
+bindSingle('triInstrumento', v=>{state.triInstrumento=v; recalc();});
+bindSingle('dietaEspecial', v=>{state.dietaEspecial=v; recalc();});
+bindSingle('fApetite', v=>{state.apetite=v; recalc();});
+bindSingle('fAceitacao', v=>{state.aceitacao=v; recalc();});
+bindMulti('fSintomas', state.sintomas, recalc);
+bindSingle('fEvacuacao', v=>{state.evacuacao=v; recalc();});
+bindSingle('fUltimaEvac', v=>{state.ultimaEvac=v; recalc();});
+bindSingle('fJejum', v=>{
+  state.jejum=v;
+  document.getElementById('jejumDetalhe').classList.toggle('hidden', v!=='sim');
+  recalc();
+});
+
+document.getElementById('fComorbidades').querySelectorAll('.check').forEach(el=>{
+  el.onclick = ()=>{
+    el.classList.toggle('on');
+    const v = el.dataset.v;
+    const i = state.comorbidades.indexOf(v);
+    if(el.classList.contains('on')){ if(i===-1) state.comorbidades.push(v); }
+    else{ if(i>-1) state.comorbidades.splice(i,1); }
+    recalc();
+  };
+});
+
+/* text inputs auto-bind */
+const textBindings = [
+  ['fLeito','leito'],['fPeso','peso'],['fAltura','altura'],['fPPR','ppr'],
+  ['fTriResultado','triResultado'],['fDietaTasy','dietaTasy'],['fDietaPos','dietaPos'],
+  ['fPreferencias','preferenciasTxt'],['fBloqueios','bloqueiosTxt'],
+  ['fAlergias','alergias'],['fIntolerancias','intolerancias'],['fSensibilidades','sensibilidades'],
+  ['fHidratacao','hidratacao'],['fJejumHorario','jejumHorario'],['fJejumMotivo','jejumMotivo'],
+  ['fOutrasComorb','outrasComorb'],['fEspecClinica','especClinica']
+];
+textBindings.forEach(([id,key])=>{
+  document.getElementById(id).addEventListener('input', e=>{ state[key]=e.target.value; recalc(); });
+});
+
+/* ---------------- CALC LOGIC ---------------- */
+function calcIMC(){
+  const p = parseFloat(state.peso), a = parseFloat(state.altura);
+  if(!p || !a) return null;
+  const am = a/100;
+  return p/(am*am);
+}
+function classifOMS(imc){
+  if(imc===null) return '—';
+  if(imc<18.5) return 'Baixo peso';
+  if(imc<25) return 'Eutrófico';
+  if(imc<30) return 'Sobrepeso';
+  if(imc<35) return 'Obesidade grau I';
+  if(imc<40) return 'Obesidade grau II';
+  return 'Obesidade grau III';
+}
+function calcNivel(){
+  const n = state.comorbidades.length;
+  const bariatrica = state.comorbidades.includes('Bariátrica');
+  const grandePorte = state.comorbidades.includes('Cirurgia de grande porte');
+  if(n>=2 || bariatrica || grandePorte) return 'Terciário';
+  if(n===1 || state.dietaEspecial==='sim') return 'Secundário';
+  return 'Primário';
+}
+function diasPorNivel(nivel){
+  return nivel==='Terciário' ? 3 : nivel==='Secundário' ? 4 : 7;
+}
+function nivelClass(n){ return n==='Terciário'?'terciario':n==='Secundário'?'secundario':'primario'; }
+
+function recalc(){
+  const dataVisita = state.data ? new Date(state.data) : nowBR();
+  const imc = calcIMC();
+  const oms = classifOMS(imc);
+  const nivel = calcNivel();
+  const dias = diasPorNivel(nivel);
+  const proxima = addDays(dataVisita, dias);
+  state._imc = imc; state._oms = oms; state._nivel = nivel; state._proxima = proxima; state._dataVisita = dataVisita;
+
+  document.getElementById('calcIMC').textContent = imc? imc.toFixed(1) : '—';
+  document.getElementById('calcOMS').textContent = oms;
+  document.getElementById('calcNivel').textContent = nivel;
+  document.getElementById('calcProxima').textContent = fmtDate(proxima);
+  document.getElementById('hdrLeito').textContent = state.leito || '—';
+  document.getElementById('hdrData').textContent = fmtDate(dataVisita);
+  document.getElementById('hdrNivel').innerHTML = `<span class="badge ${nivelClass(nivel)}"><span class="dot"></span>${nivel}</span>`;
+
+  renderGestao();
+  renderEvolucao();
+}
+
+/* ---------------- GESTÃO DA NUTRIÇÃO ---------------- */
+function renderGestao(){
+  const altM = state.altura ? (parseFloat(state.altura)/100).toFixed(2).replace('.',',') : '—';
+  const proxima = state._proxima ? fmtDate(state._proxima) : '—';
+  let info = `P: ${state.peso||'—'} kg\nA: ${altM} m\nPróxima visita: ${proxima}\nNRS: ${proxima}\nNível de assistência: ${state._nivel||'—'}`;
+  if(state.especClinica) info += `\n\n>>${state.especClinica.toUpperCase()}<<`;
+  document.getElementById('genInfoNutri').textContent = info;
+
+  // bloqueios auto
+  if(state.bloqueiosEdit===null){
+    let lines = [];
+    state.alergias.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>ALERGIA A ${a.toUpperCase()}<<`));
+    state.intolerancias.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>INTOLERÂNCIA À ${a.toUpperCase()}<<`));
+    state.sensibilidades.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>SENSIBILIDADE AO ${a.toUpperCase()}<<`));
+    document.getElementById('genBloqueios').value = lines.join('\n');
+  }
+
+  renderPrefList();
+}
+
+function renderPrefList(){
+  const list = document.getElementById('prefList');
+  list.innerHTML='';
+  state.prefItems.forEach((it,idx)=>{
+    const row = document.createElement('div');
+    row.className='listrow';
+    row.innerHTML = `<span>${it.refeicao} — ${it.texto}</span><span class="rm" data-i="${idx}">✕</span>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('.rm').forEach(el=>{
+    el.onclick = ()=>{ state.prefItems.splice(parseInt(el.dataset.i),1); renderPrefList(); genPrefText(); };
+  });
+  genPrefText();
+}
+function genPrefText(){
+  const byMeal = {};
+  state.prefItems.forEach(it=>{
+    byMeal[it.refeicao] = byMeal[it.refeicao] || [];
+    byMeal[it.refeicao].push(it.texto);
+  });
+  let out = Object.keys(byMeal).map(m=>`${m.toUpperCase()}:\n` + byMeal[m].join('\n')).join('\n\n');
+  document.getElementById('genPreferencias').textContent = out || '—';
+}
+
+let prefTipoVal = 'add';
+document.getElementById('prefTipo').querySelectorAll('.opt').forEach(o=>{
+  o.onclick = ()=>{
+    document.getElementById('prefTipo').querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
+    o.classList.add('on'); prefTipoVal = o.dataset.v;
+  };
+});
+document.getElementById('prefAddBtn').onclick = ()=>{
+  const alimento = document.getElementById('prefAlimento').value.trim();
+  if(!alimento) return;
+  const refeicao = document.getElementById('prefRefeicao').value;
+  const texto = prefTipoVal==='add' ? `ADICIONAR ${alimento.toUpperCase()}` : `PREF. ${alimento.toUpperCase()}`;
+  state.prefItems.push({refeicao, texto});
+  document.getElementById('prefAlimento').value='';
+  renderPrefList();
+};
+
+document.getElementById('genBloqueios').addEventListener('input', e=>{ state.bloqueiosEdit = e.target.value; });
+
+/* Copeira tags */
+document.querySelectorAll('.tagbtn').forEach(el=>{
+  el.onclick = ()=>{
+    const ta = document.getElementById('genCopeira');
+    ta.value = ta.value ? ta.value + '\n' + el.dataset.txt : el.dataset.txt;
+    state.copeiraTxt = ta.value;
+  };
+});
+document.getElementById('genCopeira').addEventListener('input', e=>{ state.copeiraTxt = e.target.value; });
+
+/* ---------------- EVOLUÇÃO ---------------- */
+function renderEvolucao(){
+  const nivel = state._nivel || '—';
+  const proxima = state._proxima ? fmtDate(state._proxima) : '—';
+  const comorbTxt = state.comorbidades.length ? state.comorbidades.join(' e ') : 'ausência de comorbidades relevantes';
+  const padrao = state.dietaPos || state.dietaTasy || '—';
+  const aceit = [state.apetite, state.aceitacao ? `aceitação ${state.aceitacao}`:''].filter(Boolean).join(', ') || '—';
+  const sintomas = state.sintomas.length ? state.sintomas.join(', ') : 'nega sintomas gastrointestinais';
+
+  const txt =
+`Em visita de admissão, paciente avaliado(a) sob os seguintes aspectos:
+
+NÍVEL DE ASSISTÊNCIA: ${nivel} (devido à presença de ${comorbTxt}). Próxima visita: ${proxima}.
+ESTADO NUTRICIONAL (OMS): ${state._oms||'—'}
+PADRÃO ALIMENTAR: ${padrao}
+ACEITAÇÃO ALIMENTAR: ${aceit}
+SINAIS E SINTOMAS: ${sintomas}
+CONDUTA NUTRICIONAL: ${state.especClinica ? state.especClinica.toUpperCase() : 'manutenção da conduta nutricional atual, com reavaliação programada.'}`;
+  document.getElementById('genEvolucao').textContent = txt;
+}
+
+/* ---------------- COPY / TOAST ---------------- */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = '✓ ' + msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>showToast('Copiado para a área de transferência')).catch(()=>showToast('Não foi possível copiar'));
+}
+document.querySelectorAll('[data-copy]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const el = document.getElementById(btn.dataset.copy);
+    const text = (el.tagName==='TEXTAREA') ? el.value : el.textContent;
+    copyText(text);
+  });
+});
+document.getElementById('btnCopiarEvolucao').onclick = ()=>{
+  copyText(document.getElementById('genEvolucao').textContent);
+};
+
+/* ---------------- TABS ---------------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    ['formulario','gestao','evolucao','painel'].forEach(t=>{
+      document.getElementById('tab-'+t).classList.toggle('hidden', t!==btn.dataset.tab);
+    });
+    if(btn.dataset.tab==='painel') renderPainel();
+  };
+});
+
+/* ---------------- SAVE / PAINEL ---------------- */
+document.getElementById('btnSalvar').onclick = async ()=>{
+  if(!state.leito){ showToast('Informe o leito antes de salvar'); return; }
+  const record = {...state, savedAt: nowBR().toISOString(), dataVisita: state._dataVisita.toISOString(), proxima: state._proxima.toISOString(), nivel: state._nivel, oms: state._oms, imc: state._imc};
+  try{
+    await window.storage.set('visita:'+state.leito, JSON.stringify(record), false);
+    showToast('Visita salva — leito ' + state.leito);
+  }catch(e){ showToast('Erro ao salvar'); }
+};
+
+async function renderPainel(){
+  const listEl = document.getElementById('painelList');
+  const emptyEl = document.getElementById('painelEmpty');
+  listEl.innerHTML = '<div class="empty">Carregando…</div>';
+  try{
+    const keys = await window.storage.list('visita:', false);
+    if(!keys || !keys.keys || keys.keys.length===0){
+      listEl.innerHTML=''; emptyEl.classList.remove('hidden'); return;
+    }
+    emptyEl.classList.add('hidden');
+    const items = [];
+    for(const k of keys.keys){
+      try{
+        const r = await window.storage.get(k, false);
+        if(r) items.push(JSON.parse(r.value));
+      }catch(e){}
+    }
+    items.sort((a,b)=> a.leito.localeCompare(b.leito));
+    const today = fmtDate(nowBR());
+    listEl.innerHTML = items.map(it=>{
+      const nivel = it.nivel || 'Primário';
+      const visitedToday = fmtDate(new Date(it.dataVisita)) === today;
+      return `<div class="leito-card">
+        <div class="leito-num">${it.leito}</div>
+        <div class="leito-info">
+          <div class="l1"><span class="badge ${nivelClass(nivel)}"><span class="dot"></span>${nivel}</span></div>
+          <div class="l2">Última: ${fmtDate(new Date(it.dataVisita))} · Próxima: ${fmtDate(new Date(it.proxima))}</div>
+        </div>
+        <span class="status-pill ${visitedToday?'hoje':'pend'}">${visitedToday?'Visitado hoje':'Pendente'}</span>
+      </div>`;
+    }).join('');
+  }catch(e){
+    listEl.innerHTML = '<div class="empty">Não foi possível carregar os leitos.</div>';
+  }
+}
+
+/* ---------------- INIT ---------------- */
+(function init(){
+  const d = nowBR();
+  state.data = d.toISOString();
+  document.getElementById('fData').value = fmtDate(d);
+  document.getElementById('fJejum').querySelector('[data-v="nao"]').classList.add('on');
+  document.getElementById('dietaEspecial').querySelector('[data-v="nao"]').classList.add('on');
+  recalc();
+})();
+</script>
+</body>
+</html>
