@@ -199,6 +199,12 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
         <input type="text" id="fLeito" maxlength="3" inputmode="numeric" placeholder="317">
       </div>
       <div class="field">
+        <label>Andar</label>
+        <input type="text" id="fAndar" placeholder="Ex: 4º andar">
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
         <label>Data da visita</label>
         <input type="text" id="fData" disabled>
       </div>
@@ -387,20 +393,18 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
   <div class="card">
     <div class="card-title"><span class="ic">📊</span> Informações Nutricionais</div>
     <div class="gen-block" id="genInfoNutri">—</div>
-    <div class="field"><label>Especificação clínica</label><input type="text" id="fEspecClinica" placeholder="Ex: dieta hipogordurosa"></div>
+    <div class="field"><label>Observação nutricional complementar (separe por vírgula)</label><input type="text" id="fEspecClinica" placeholder="Ex: dieta hipossódica, DM tipo 2, pós-bariátrica"></div>
     <button class="copybtn" data-copy="genInfoNutri">📋 Copiar</button>
   </div>
 
   <div class="card">
     <div class="card-title"><span class="ic">🍽️</span> Preferências</div>
-    <div class="row2">
-      <select id="prefRefeicao">
-        <option>Desjejum</option><option>Colação</option><option>Almoço</option>
-        <option>Lanche</option><option>Jantar</option><option>Ceia</option>
-      </select>
+    <div class="sub-label">Refeições (pode marcar mais de uma)</div>
+    <div class="chipselect wrap" id="prefRefeicoes"></div>
+    <div class="row2" style="margin-top:10px;">
       <div class="togglebtns" id="prefTipo">
-        <div class="opt on" data-v="add">Adicionar</div>
-        <div class="opt" data-v="pref">Preferência</div>
+        <div class="opt on" data-v="pref">Preferência</div>
+        <div class="opt" data-v="add">Adicionar</div>
       </div>
     </div>
     <div class="addbar">
@@ -425,6 +429,8 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
       <div class="tagbtn" data-txt="SEM GELO">Sem gelo</div>
       <div class="tagbtn" data-txt="SERVIR EM TEMPERATURA AMBIENTE">Temp. ambiente</div>
       <div class="tagbtn" data-txt="AQUECER REFEIÇÃO">Aquecer</div>
+      <div class="tagbtn" data-txt="CORTAR ALIMENTOS">Cortar alimentos</div>
+      <div class="tagbtn" data-txt="ENVIAR TALHER ADAPTADO">Talher adaptado</div>
     </div>
     <div class="tagrow">
       <div class="tagbtn" data-txt="VIP">🌟 VIP</div>
@@ -470,7 +476,7 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
 /* ---------------- STATE ---------------- */
 const MEALS = ['Desjejum','Colação','Almoço','Lanche da tarde','Jantar','Ceia'];
 let state = {
-  leito:'', data:'', nascimento:'', sexo:'',
+  leito:'', andar:'', data:'', nascimento:'', sexo:'',
   peso:'', altura:'', ppr:'',
   egConsciencia:'', egColaboracao:'', egAcompanhante:'',
   triResultado:'',
@@ -563,7 +569,7 @@ document.getElementById('fComorbidades').querySelectorAll('.check').forEach(el=>
 });
 
 const textBindings = [
-  ['fLeito','leito'],['fPeso','peso'],['fAltura','altura'],['fPPR','ppr'],
+  ['fLeito','leito'],['fAndar','andar'],['fPeso','peso'],['fAltura','altura'],['fPPR','ppr'],
   ['fTriResultado','triResultado'],['fDietaTasy','dietaTasy'],['fDietaPos','dietaPos'],
   ['fPreferencias','preferenciasTxt'],['fBloqueios','bloqueiosTxt'],
   ['fAlergias','alergias'],['fIntolerancias','intolerancias'],['fSensibilidades','sensibilidades'],
@@ -574,6 +580,26 @@ const textBindings = [
 ];
 textBindings.forEach(([id,key])=>{
   document.getElementById(id).addEventListener('input', e=>{ state[key]=e.target.value; recalc(); });
+});
+
+/* Chips de refeição para Preferências (multi-seleção) */
+const prefRefeicoesEl = document.getElementById('prefRefeicoes');
+let prefRefeicoesSel = [];
+MEALS.forEach(m=>{
+  const opt = document.createElement('div');
+  opt.className='opt';
+  opt.dataset.v = m;
+  opt.textContent = m;
+  prefRefeicoesEl.appendChild(opt);
+});
+prefRefeicoesEl.querySelectorAll('.opt').forEach(o=>{
+  o.onclick = ()=>{
+    o.classList.toggle('on');
+    const v = o.dataset.v;
+    const i = prefRefeicoesSel.indexOf(v);
+    if(o.classList.contains('on')){ if(i===-1) prefRefeicoesSel.push(v); }
+    else{ if(i>-1) prefRefeicoesSel.splice(i,1); }
+  };
 });
 
 /* Aceitação por refeição */
@@ -793,14 +819,19 @@ function renderGestao(){
   const proxima = state._proxima ? fmtDate(state._proxima) : '—';
   const protoLabel = `${state._protocolo.sigla} (${faixaLabel(state._faixa)})`;
   let info = `Informações nutricionais: P: ${state.peso||'—'} Kg // A: ${altM} m // Próxima visita: ${proxima} // ${protoLabel}: ${proxima} // Nível de assistência: ${state._nivel||'—'}.`;
-  if(state.especClinica) info += ` >>${state.especClinica.toUpperCase()}<<`;
+  const obsItems = (state.especClinica||'').split(',').map(s=>s.trim()).filter(Boolean);
+  if(obsItems.length) info += '\n\n' + obsItems.map(o=>`>>${o.toUpperCase()}<<`).join('\n');
   document.getElementById('genInfoNutri').textContent = info;
 
   if(state.bloqueiosEdit===null){
     let lines = [];
-    state.alergias.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>ALERGIA A ${a.toUpperCase()}<<`));
-    state.intolerancias.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>INTOLERÂNCIA À ${a.toUpperCase()}<<`));
-    state.sensibilidades.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`>>SENSIBILIDADE AO ${a.toUpperCase()}<<`));
+    const alergiasList = state.alergias.split(',').map(s=>s.trim()).filter(Boolean);
+    const intolList = state.intolerancias.split(',').map(s=>s.trim()).filter(Boolean);
+    const sensList = state.sensibilidades.split(',').map(s=>s.trim()).filter(Boolean);
+    if(alergiasList.length) lines.push(`>>>ALERGIA A: ${alergiasList.join(', ').toUpperCase()}<<<`);
+    if(intolList.length) lines.push(`>>>INTOLERÂNCIA A: ${intolList.join(', ').toUpperCase()}<<<`);
+    if(sensList.length) lines.push(`>>>SENSIBILIDADE A: ${sensList.join(', ').toUpperCase()}<<<`);
+    state.bloqueiosTxt.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`NÃO GOSTA DE ${a.toUpperCase()}`));
     document.getElementById('genBloqueios').value = lines.join('\n');
   }
   renderPrefList();
@@ -825,7 +856,7 @@ function genPrefText(){
   let out = Object.keys(byMeal).map(m=>`${m.toUpperCase()}:\n` + byMeal[m].join('\n')).join('\n\n');
   document.getElementById('genPreferencias').textContent = out || '—';
 }
-let prefTipoVal = 'add';
+let prefTipoVal = 'pref';
 document.getElementById('prefTipo').querySelectorAll('.opt').forEach(o=>{
   o.onclick = ()=>{
     document.getElementById('prefTipo').querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
@@ -918,8 +949,13 @@ function fraseEstadoNutricional(){
   }
   return `Estado nutricional: ${state._oms}.`;
 }
+function frasePrefsBloqueiosGenerica(){
+  const temAlgo = (state.preferenciasTxt||'').trim() || (state.prefItems&&state.prefItems.length) || (state.bloqueiosTxt||'').trim();
+  return temAlgo ? 'Registradas preferências e bloqueios alimentares na gestão nutricional.' : '';
+}
 
-function renderEvolucao(){
+/* ---------- MODELO ADULTO / IDOSO ---------- */
+function renderEvolucaoAdulto(){
   const proxima = state._proxima ? fmtDate(state._proxima) : '—';
   const linhas = [
     fraseEstadoGeral(),
@@ -931,17 +967,75 @@ function renderEvolucao(){
     fraseAceitacao(),
     listOrNegative(state.alergias, 'Nega alergias alimentares.', 'Refere alergia a '),
     listOrNegative(state.intolerancias, 'Nega intolerâncias alimentares.', 'Refere intolerância a '),
-    listOrNegative(state.sensibilidades, 'Nega sensibilidades alimentares.', 'Refere sensibilidade a '),
-    listOrNegative(state.preferenciasTxt, 'Sem preferências alimentares relatadas.', 'Preferências alimentares: '),
-    listOrNegative(state.bloqueiosTxt, 'Sem bloqueios alimentares relatados.', 'Bloqueios alimentares: '),
+    listOrNegative(state.sensibilidades, 'Nega sensibilidades alimentares.', 'Refere sensibilidade a ')
+  ];
+  const prefsLinha = frasePrefsBloqueiosGenerica();
+  if(prefsLinha) linhas.push(prefsLinha);
+  linhas.push(
     fraseSintomas(),
     fraseEvacuacao(),
     fraseHidratacao(),
     fraseJejum(),
     '',
     'CONDUTA NUTRICIONAL: ' + (state.especClinica ? state.especClinica.toUpperCase()+'.' : 'Mantida conduta nutricional atual, com reavaliação programada.')
-  ].filter(l=>l!=='' || true);
+  );
   document.getElementById('genEvolucao').textContent = linhas.join('\n');
+}
+
+/* ---------- MODELO PEDIÁTRICO (0 a 18 anos incompletos) ---------- */
+function fraseAcompanhantePed(){
+  if(state.egAcompanhante==='Com acompanhante') return 'encontro paciente acompanhado por seu responsável.';
+  if(state.egAcompanhante==='Sem acompanhante') return 'encontro paciente desacompanhado.';
+  return 'encontro paciente para avaliação nutricional.';
+}
+function refereNega(txt, label){
+  const items = (txt||'').split(',').map(s=>s.trim()).filter(Boolean);
+  return items.length ? `Refere ${label}: ${items.join(', ')}.` : `Nega ${label}.`;
+}
+function refereNegaComorbPed(){
+  const list=[...state.comorbidades]; if(state.outrasComorb) list.push(state.outrasComorb);
+  return list.length ? `Refere comorbidades: ${list.join(', ')}.` : 'Nega comorbidades.';
+}
+function habitoIntestinalPed(){
+  let f = state.evacuacao ? `Hábito intestinal ${state.evacuacao.toLowerCase()}` : 'Hábito intestinal não relatado';
+  if(state.evacUltimaData){
+    const d = new Date(state.evacUltimaData+'T00:00:00');
+    f += `, sendo a última evacuação em ${fmtDate(d)}`;
+  }
+  return f + '.';
+}
+function hidratacaoMl(){
+  if(!state.hidratacao) return '___';
+  return String(Math.round(parseFloat(state.hidratacao)*1000));
+}
+function aceitacaoLinhaPed(){
+  return MEALS.map(m=> `${m} ${state.aceitacao[m]||'—'}`).join('; ') + '.';
+}
+function renderEvolucaoPediatrica(){
+  const proxima = state._proxima ? fmtDate(state._proxima) : '__/__/____';
+  const condutaDieta = state.especClinica || state.dietaPos || state.dietaTasy || '________________';
+  const linhas = [
+    `Andar: ${state.andar||'___'}  Leito: ${state.leito||'___'}`,
+    '',
+    `Em visita de admissão, ${fraseAcompanhantePed()} Confirmados peso e altura. ${refereNega(state.alergias,'alergias alimentares')} ${refereNega(state.intolerancias,'intolerâncias alimentares')} ${refereNega(state.sensibilidades,'sensibilidades alimentares')} ${habitoIntestinalPed()} Ingestão hídrica referida de aproximadamente ${hidratacaoMl()} mL nas últimas 24 horas. Registradas preferências e bloqueios alimentares na gestão nutricional. Segundo o gráfico de IMC para idade da Organização Mundial da Saúde (OMS), paciente apresenta ${(state._oms||'classificação nutricional a definir').toLowerCase()}. ${refereNegaComorbPed()} Aceitação alimentar: ${aceitacaoLinhaPed()}`,
+    '',
+    `Triagem Nutricional: Strong Kids: ${state.triResultado||'___'}.`,
+    `Nível de assistência: ${state._nivel||'—'}. Próxima visita: ${proxima}.`,
+    '',
+    'Conduta nutricional:',
+    `• Mantenho/Altero dieta para ${condutaDieta};`,
+    '• Ajusto o planejamento alimentar conforme preferências e bloqueios alimentares;',
+    '• Acompanho hábito intestinal, nível de hidratação, apetite e aceitação alimentar;',
+    '• Oriento o responsável quanto à hidratação e à alimentação adequada, conforme faixa etária e condição clínica;',
+    '• Acompanho a manutenção do estado nutricional por meio das curvas de crescimento da OMS;',
+    '• Acolho dúvidas, críticas e elogios.'
+  ];
+  document.getElementById('genEvolucao').textContent = linhas.join('\n');
+}
+
+function renderEvolucao(){
+  if(state._faixa==='crianca' || state._faixa==='adolescente') renderEvolucaoPediatrica();
+  else renderEvolucaoAdulto();
 }
 
 /* ---------------- COPY / TOAST ---------------- */
