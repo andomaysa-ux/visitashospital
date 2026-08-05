@@ -1,1147 +1,850 @@
-<!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>Nutri Hospital</title>
-<link rel="preconnect" href="https://api.fontshare.com">
-<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=general-sans@600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0A0D14;
-  --bg-grad: radial-gradient(circle at 15% -10%, #1B2340 0%, transparent 45%), radial-gradient(circle at 100% 0%, #1A1030 0%, transparent 40%), #0A0D14;
-  --surface: rgba(255,255,255,0.045);
-  --surface-strong: rgba(255,255,255,0.07);
-  --border: rgba(255,255,255,0.09);
-  --border-soft: rgba(255,255,255,0.05);
-  --text: #EDEFF6;
-  --text-dim: #9BA3B8;
-  --text-faint: #6B7286;
-  --accent: #7C9CFF;
-  --accent2: #B98CFF;
-  --accent-grad: linear-gradient(135deg,#6C8EFF 0%, #A97CFF 100%);
-  --accent-soft: rgba(124,156,255,0.14);
-  --ok: #5FE0A6;
-  --warn: #F5C563;
-  --danger: #FF7A85;
-  --radius: 18px;
-  --radius-sm: 12px;
-  --shadow: 0 8px 32px rgba(0,0,0,0.35);
-  --font: 'General Sans', -apple-system, BlinkMacSystemFont, 'Inter Tight', 'Segoe UI', sans-serif;
-}
-html[data-theme="comfort"]{
-  --bg:#F3ECD8;
-  --bg-grad: radial-gradient(circle at 15% -10%, #F8E9CE 0%, transparent 45%), #F3ECD8;
-  --surface: rgba(70,50,20,0.045);
-  --surface-strong: rgba(70,50,20,0.075);
-  --border: rgba(70,50,20,0.12);
-  --border-soft: rgba(70,50,20,0.07);
-  --text: #3A3020;
-  --text-dim: #7A6D52;
-  --text-faint: #9C8F72;
-  --accent: #8A5A2E;
-  --accent2: #B9793C;
-  --accent-grad: linear-gradient(135deg,#B9793C 0%, #8A5A2E 100%);
-  --accent-soft: rgba(138,90,46,0.12);
-  --ok: #4E8F63;
-  --warn: #B5842A;
-  --danger: #B5482F;
-  --shadow: 0 8px 28px rgba(90,70,30,0.14);
-}
-*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
-body{margin:0; background:var(--bg-grad); background-attachment:fixed; color:var(--text); font-family:var(--font); min-height:100vh; padding-bottom:92px; transition:background .3s,color .3s;}
-h1,h2,h3{font-weight:600; margin:0;}
-button{font-family:var(--font);}
-input,select,textarea{font-family:var(--font); color:var(--text); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:11px 12px; font-size:15px; width:100%; outline:none; transition:border .2s, background .2s;}
-input:focus,select:focus,textarea:focus{border-color:var(--accent); background:var(--surface-strong);}
-input::placeholder,textarea::placeholder{color:var(--text-faint);}
-label{display:block; font-size:12.5px; color:var(--text-dim); margin-bottom:6px; letter-spacing:.02em;}
-.field{margin-bottom:14px;}
-.row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-.row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+{
+  "metadata": {
+    "aplicativo": "Nutri Dietas",
+    "dieta": "Dieta Hipopotássica (Baixa em Potássio)",
+    "versao_banco": "1.0",
+    "data_elaboracao": "2026-08-04",
+    "metodologia": "Classificação baseada em valores analíticos de potássio (mg/100g de parte comestível) extraídos diretamente da Tabela Brasileira de Composição de Alimentos (TACO, 4ª edição, NEPA-UNICAMP, 2011), cruzados com diretrizes clínicas de restrição de potássio em Doença Renal Crônica (KDOQI 2020, SBN, BRASPEN) e com o Manual para Pacientes com DRC Estágios 4 e 5 (Sociedade Brasileira de Nefrologia).",
+    "limitacoes_importantes": [
+      "A TBCA (USP) NÃO estava disponível como arquivo para consulta direta nesta sessão. Todos os valores numéricos de potássio apresentados são oriundos exclusivamente da TACO 4ª edição. Recomenda-se validação cruzada com a TBCA antes do uso clínico definitivo, especialmente para alimentos não constantes na TACO.",
+      "A TACO informa 'potássio' em mg por 100g de parte comestível, sem distinguir sistematicamente porção habitual de consumo. Alimentos classificados como 🟢 ou 🟡 em base de 100g podem tornar-se inadequados em porções maiores — ver campo 'observacoes' de cada item.",
+      "Valores de potássio são reduzidos por cocção em água abundante com descarte da água (evidenciado numericamente abaixo, comparando cru vs. cozido na própria TACO), mas a magnitude da redução varia por alimento e não há padronização de 'dupla cocção' na TACO — essa técnica é uma recomendação clínica (BRASPEN/SBN/Manuais Hospitalares), não um dado laboratorial.",
+      "Não foram feitas estimativas ou extrapolações: alimentos citados no manual de origem mas não localizados na TACO (ex.: Lima da Pérsia, Nectarina, Avelã, Damasco, Sal Light industrial específico) estão marcados como 'dado_nao_localizado' e não recebem valor numérico inventado.",
+      "Cortes de classificação numérica adotados (convenção clínica usual em manuais brasileiros de nefrologia, não um valor único de consenso internacional): 🟢 Preferir ≈ K ≤150 mg/100g; 🟡 Moderação ≈ 150–250 mg/100g; 🔴 Evitar ≈ >250 mg/100g (ou alimento tradicionalmente restrito por concentração/porção habitual mesmo com valor tabelado menor); 🟠 aplica-se a hortaliças/tubérculos cujo teor é reduzido por técnica de preparo, independentemente da faixa numérica bruta."
+    ],
+    "referencias_gerais": [
+      "Brasil. Tabela Brasileira de Composição de Alimentos (TACO). 4. ed. Campinas: NEPA-UNICAMP, 2011.",
+      "Ikizler TA, Burrowes JD, Byham-Gray LD et al. KDOQI Clinical Practice Guideline for Nutrition in CKD: 2020 update. Am J Kidney Dis. 2020;76(3 Suppl 1):S1-107.",
+      "Fabre L, Canziani MEF. Manual para Pacientes com Doença Renal Crônica: Estágios 4 e 5. Sociedade Brasileira de Nefrologia, 2023-2024 (Programa de Mentoria).",
+      "Watanabe R. Hyperkalemia in chronic kidney disease. Rev Assoc Med Bras. 2020;66(Suppl 1):s31-6.",
+      "BRASPEN — diretrizes gerais de terapia nutricional (referência institucional citada pelo manual de origem do projeto; consultar diretriz específica de nutrição em nefrologia da BRASPEN para validação complementar)."
+    ]
+  },
 
-header{position:sticky; top:0; z-index:30; backdrop-filter:blur(18px); background:rgba(10,13,20,0.55); border-bottom:1px solid var(--border-soft); padding:14px 16px 12px;}
-html[data-theme="comfort"] header{background:rgba(243,236,216,0.7);}
-.hdr-top{display:flex; align-items:center; justify-content:space-between; gap:10px;}
-.brand{display:flex; align-items:center; gap:9px;}
-.brand-mark{width:30px; height:30px; border-radius:9px; background:var(--accent-grad); display:flex; align-items:center; justify-content:center; font-size:15px; box-shadow:0 0 18px var(--accent-soft);}
-.brand-name{font-size:15.5px; font-weight:600; letter-spacing:-.01em;}
-.brand-sub{font-size:10.5px; color:var(--text-faint); margin-top:-2px;}
-.theme-toggle{width:38px; height:38px; border-radius:12px; border:1px solid var(--border); background:var(--surface); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;}
-.hdr-meta{display:flex; gap:8px; margin-top:12px;}
-.chip{flex:1; background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:8px 10px;}
-.chip .k{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint);}
-.chip .v{font-size:14.5px; font-weight:600; margin-top:1px;}
-.badge{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:20px; font-size:11.5px; font-weight:600;}
-.badge.primario{background:rgba(95,224,166,0.15); color:var(--ok);}
-.badge.secundario{background:rgba(245,197,99,0.15); color:var(--warn);}
-.badge.terciario{background:rgba(255,122,133,0.15); color:var(--danger);}
-.dot{width:7px; height:7px; border-radius:50%; background:currentColor;}
+  "alimentos": [
 
-main{max-width:640px; margin:0 auto; padding:16px;}
-.card{background:var(--surface); border:1px solid var(--border-soft); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow);}
-.card-title{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; margin-bottom:14px; color:var(--text);}
-.card-title .ic{font-size:15px;}
-.card-title .tag{margin-left:auto; font-size:10px; padding:3px 8px; border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.04em;}
-.section-label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); margin:0 0 10px 2px;}
-.sub-label{font-size:11.5px; color:var(--text-dim); margin:14px 0 8px; font-weight:600;}
-.sub-label:first-child{margin-top:0;}
+    {
+      "nome": "Maçã (Fuji, com casca)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 75,
+      "justificativa": "TACO (item 222): 75 mg K/100g, um dos valores mais baixos entre as frutas tabeladas. Compatível com recomendação do Manual SBN (lista de alimentos com baixo teor de potássio, p.45) e com KDOQI 2020 para frutas de baixo K.",
+      "observacoes": "Variedade 'Maçã, Argentina, com casca, crua' (item 221) tem valor um pouco maior: 117 mg/100g — ainda assim classificada como 🟢. Controle de porção recomendado mesmo em frutas 🟢 quando consumo for >2 porções/refeição.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Pêra", "Abacaxi", "Morango"],
+      "referencias": ["TACO 4ª ed., itens 221-222, p.40-41", "Manual SBN DRC 4-5, p.45"]
+    },
+    {
+      "nome": "Pêra",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 102,
+      "justificativa": "TACO: Pêra Park crua (item 242) = 102 mg K/100g; Pêra Williams crua (item 243) = 116 mg K/100g. Baixo teor, consistente com Manual SBN (item 'Pêra e maçã' citado como baixo potássio, p.45).",
+      "observacoes": "Ambas as cultivares mantêm-se na faixa 🟢.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Abacaxi", "Melancia"],
+      "referencias": ["TACO 4ª ed., itens 242-243, p.40-41", "Manual SBN DRC 4-5, p.45"]
+    },
+    {
+      "nome": "Abacaxi",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 131,
+      "justificativa": "TACO (item 164): 131 mg K/100g (cru); polpa congelada (item 165) = 107 mg/100g, ainda mais baixo.",
+      "observacoes": "Nenhuma.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Melancia"],
+      "referencias": ["TACO 4ª ed., itens 164-165, p.36-37"]
+    },
+    {
+      "nome": "Melancia",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 104,
+      "justificativa": "TACO (item 235): 104 mg K/100g. Baixo teor, corroborado pelo Manual SBN como exemplo de alimento com baixo potássio (p.45, 'Pêssego e morango'/frutas de baixo K).",
+      "observacoes": "Fruta de alto teor de água; porções muito grandes (>1 fatia grande) elevam a carga total de potássio mesmo com concentração baixa por 100g — orientar controle por porção.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Abacaxi", "Maçã", "Pêra"],
+      "referencias": ["TACO 4ª ed., item 235, p.40-41"]
+    },
+    {
+      "nome": "Caju",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 124,
+      "justificativa": "TACO (item 186): 124 mg K/100g (cru); polpa congelada (item 187) = 88 mg/100g.",
+      "observacoes": "Não confundir com a castanha de caju (semente), que é rica em potássio e classificada 🔴.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Abacaxi", "Maçã"],
+      "referencias": ["TACO 4ª ed., itens 186-187, p.36-37"]
+    },
+    {
+      "nome": "Jabuticaba",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 130,
+      "justificativa": "TACO (item 203): 130 mg K/100g.",
+      "observacoes": "Nenhuma.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Uva (com moderação)", "Maçã"],
+      "referencias": ["TACO 4ª ed., item 203, p.38-39"]
+    },
+    {
+      "nome": "Laranja Lima",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 130,
+      "justificativa": "TACO (item 212): 130 mg K/100g (crua); suco (item 213) = 129 mg/100g.",
+      "observacoes": "Comparar com Laranja da Terra (174 mg/100g) e Laranja Baía (174 mg/100g), que apresentam teor mais elevado — ver item 'Laranja (baía/da terra/pera)' classificado 🟡/🔴.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Limão", "Maçã"],
+      "referencias": ["TACO 4ª ed., itens 212-213, p.38-39"]
+    },
+    {
+      "nome": "Limão (Tahiti/Cravo/Galego)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 128,
+      "justificativa": "TACO: Limão Tahiti cru (item 220) = 128 mg/100g; suco de Limão Cravo (item 218) = 120 mg/100g; suco de Limão Galego (item 219) = 113 mg/100g. Todos baixos.",
+      "observacoes": "Uso habitual é como tempero/suco em pequena quantidade, o que reduz ainda mais a carga de potássio por porção.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Não aplicável (uso como tempero)"],
+      "referencias": ["TACO 4ª ed., itens 218-220, p.38-39"]
+    },
+    {
+      "nome": "Manga (Tommy Atkins/Haden)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 138,
+      "justificativa": "TACO: Manga Tommy Atkins crua (item 231) = 138 mg/100g; Manga Haden crua (item 228) = 148 mg/100g; Manga Palmer crua (item 229) = 157 mg/100g. Valores próximos ao limite entre 🟢 e 🟡; recomenda-se controle de porção (evitar mangas grandes inteiras).",
+      "observacoes": "Divergência de faixa entre cultivares: Tommy Atkins/Haden ficam no limite inferior (~🟢/🟡), enquanto Palmer já ultrapassa 150 mg/100g. Classificação conservadora 🟡 adotada para o grupo 'manga' em geral.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., itens 228-229, 231, p.40-41"]
+    },
+    {
+      "nome": "Morango",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 184,
+      "justificativa": "TACO (item 239): 184 mg K/100g. Valor moderado; o Manual SBN cita 'Pêssego e morango' como exemplo de baixo potássio (p.45) — HÁ DIVERGÊNCIA entre a classificação qualitativa do manual clínico (baixo) e o valor quantitativo da TACO (moderado, próximo ao limite 🟡).",
+      "observacoes": "DIVERGÊNCIA IDENTIFICADA: Manual SBN classifica morango entre os alimentos de baixo potássio; valor numérico da TACO (184 mg/100g) é superior ao de frutas claramente 🟢 (maçã 75-117, pêra 102-116, melancia 104). Classificação adotada aqui é conservadora (🟡) até validação com TBCA; nutricionista deve avaliar porção habitual (geralmente pequena, o que atenua o impacto).",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., item 239, p.40-41", "Manual SBN DRC 4-5, p.45"]
+    },
+    {
+      "nome": "Pêssego",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 124,
+      "justificativa": "TACO: Pêssego Aurora cru (item 244) = 124 mg/100g; enlatado em calda drenado (item 245) = 95 mg/100g (redução pelo processamento/drenagem da calda).",
+      "observacoes": "Coerente com Manual SBN (p.45).",
+      "tecnica_preparo": "Se em calda: drenar o líquido antes de consumir reduz ainda mais o teor (mas aumenta açúcar).",
+      "substituicoes": ["Maçã", "Pêra"],
+      "referencias": ["TACO 4ª ed., itens 244-245, p.40-41", "Manual SBN DRC 4-5, p.45"]
+    },
+    {
+      "nome": "Pitanga",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 113,
+      "justificativa": "TACO (item 247): 113 mg K/100g; polpa congelada (item 248) = 87 mg/100g.",
+      "observacoes": "Nenhuma.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Morango (com moderação)", "Maçã"],
+      "referencias": ["TACO 4ª ed., itens 247-248, p.40-41"]
+    },
+    {
+      "nome": "Caqui",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 164,
+      "justificativa": "TACO (item 189, 'Caqui, chocolate, cru'): 164 mg K/100g — valor moderado, acima do corte de 150 mg adotado para 🟢.",
+      "observacoes": "Listado como 'permitido' no material de origem do projeto, porém o valor TACO o posiciona mais adequadamente em 🟡; recomenda-se controle de porção (meia unidade).",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra"],
+      "referencias": ["TACO 4ª ed., item 189, p.38-39"]
+    },
+    {
+      "nome": "Banana Maçã",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 264,
+      "justificativa": "TACO (item 178): 264 mg K/100g — valor NOTAVELMENTE MAIS ALTO do que as demais frutas classificadas como 'preferir' no material de origem do projeto (que listava Banana Maçã entre as frutas permitidas).",
+      "observacoes": "DIVERGÊNCIA RELEVANTE: o material de origem do projeto (lista fornecida pelo usuário) classifica 'Banana maçã' como fruta PERMITIDA na dieta hipopotássica, enquanto o valor da TACO (264 mg/100g) é próximo ao de outras bananas geralmente restritas (Banana Prata 358 mg/100g, Banana Nanica 376 mg/100g — ver itens 🔴). A diferença é real (banana maçã tem menos potássio que prata/nanica), mas 264 mg/100g ultrapassa o corte usual de 150-250 mg para 🟡/🔴 em diversos protocolos de nefrologia. Recomenda-se que a equipe clínica revise esta classificação antes de liberar 'Banana maçã' como 🟢 no aplicativo, e que a porção seja rigorosamente controlada (ex.: 1/2 unidade pequena) se mantida como opção.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., item 178, p.36-37", "Documento de origem do projeto (lista de frutas permitidas)"]
+    },
 
-.chipselect{display:flex; flex-wrap:wrap; gap:8px;}
-.chipselect .opt{padding:9px 14px; border-radius:11px; border:1px solid var(--border); background:var(--surface); font-size:13.5px; cursor:pointer; color:var(--text-dim); transition:.15s;}
-.chipselect .opt.on{background:var(--accent-grad); color:#0A0D14; border-color:transparent; font-weight:600;}
-html[data-theme="comfort"] .chipselect .opt.on{color:#fff;}
-.chipselect.grid3{display:grid; grid-template-columns:1fr 1fr 1fr;}
-.chipselect.wrap .opt{flex:0 0 auto;}
+    {
+      "nome": "Abacate",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 206,
+      "justificativa": "TACO (item 163): 206 mg K/100g. Valor moderado-alto; combinado ao elevado teor de lipídeos (8,4g/100g) e à recomendação padrão de restrição em dietas hipopotássicas hospitalares (consta como contraindicado no documento de origem do projeto).",
+      "observacoes": "O valor absoluto de potássio é inferior ao de outras frutas claramente 🔴 (ex.: banana nanica 376 mg/100g), mas a restrição é mantida por consenso clínico do manual de origem e pelo alto teor calórico/lipídico, que também é fator relevante em dietas hospitalares.",
+      "tecnica_preparo": "Não aplicável (fruta crua, sem técnica de redução).",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi", "Morango", "Melancia"],
+      "referencias": ["TACO 4ª ed., item 163, p.36-37", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Açaí (polpa)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 124,
+      "justificativa": "TACO: Açaí polpa congelada (item 168) = 124 mg K/100g; com xarope de guaraná (item 167) = 75 mg/100g. O documento de origem do projeto classifica açaí como contraindicado.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: o valor numérico de potássio por 100g na TACO não é elevado (comparável a frutas 🟢). A restrição clínica tradicional ao açaí em dietas renais provavelmente decorre de outros fatores — alto teor de lipídeos/calorias (3,9g lipídeos/100g) e volume habitual de consumo (tigelas de 300-500g), que multiplicam a carga total de potássio, não do valor por 100g isoladamente. Recomenda-se que a equipe clínica documente explicitamente o motivo da restrição (calórico/lipídico e de porção, não estritamente o teor de K por 100g) para orientar corretamente o paciente.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Morango (moderação)"],
+      "referencias": ["TACO 4ª ed., itens 167-168, p.36-37", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Água de coco",
+      "categoria_alimentar": "Bebida",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100ml": 162,
+      "justificativa": "TACO (item 478): 162 mg K/100ml. Manual SBN cita água de coco como 'naturalmente rica em potássio' e alimento a evitar (Dicas Clínicas do documento de origem; Manual SBN também recomenda cautela com bebidas ricas em K, p.46).",
+      "observacoes": "DIVERGÊNCIA QUANTITATIVA A REGISTRAR: 162 mg/100ml não se enquadra estritamente na faixa 'alta' (>250 mg) pelos cortes numéricos adotados neste banco — é próximo ao de frutas 🟡. A classificação 🔴 é mantida por: (1) consenso clínico explícito nos dois documentos de referência fornecidos; (2) volume habitual de consumo elevado (200-300 ml por porção, totalizando 320-490 mg de K por porção, valor relevante); (3) rápida absorção em forma líquida. Diverge de bases internacionais como USDA, que registram valores maiores (~250 mg/100ml) — recomenda-se checagem futura com TBCA para reconciliar.",
+      "tecnica_preparo": "Não aplicável (líquido).",
+      "substituicoes": ["Água", "Chá (mate/preto/erva-doce, com moderação)"],
+      "referencias": ["TACO 4ª ed., item 478, p.56-57", "Documento de origem do projeto (Dicas Clínicas)", "Manual SBN DRC 4-5, p.46"]
+    },
+    {
+      "nome": "Banana Prata",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 358,
+      "justificativa": "TACO (item 182): 358 mg K/100g. Alto teor, confirma classificação como contraindicada no documento de origem.",
+      "observacoes": "Nenhuma divergência — dado TACO confirma fortemente a restrição clínica.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi", "Morango"],
+      "referencias": ["TACO 4ª ed., item 182, p.36-37"]
+    },
+    {
+      "nome": "Banana Nanica",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 376,
+      "justificativa": "TACO (item 179): 376 mg K/100g. Um dos valores mais altos entre as frutas comuns tabeladas; confirma restrição.",
+      "observacoes": "Nenhuma divergência.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi", "Morango"],
+      "referencias": ["TACO 4ª ed., item 179, p.36-37"]
+    },
+    {
+      "nome": "Figo (fresco)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 174,
+      "justificativa": "TACO (item 194): 174 mg K/100g (fresco cru). O documento de origem classifica 'Figo' genericamente como contraindicado.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: o figo FRESCO tem valor moderado (174 mg/100g), inferior ao de diversos itens 🔴. A restrição tradicional a 'frutas secas' (que concentram potássio, conforme já citado no documento de origem: 'Frutas secas concentram mais potássio que as frutas frescas') aplica-se com muito mais força ao figo SECO/desidratado, não localizado como item específico na TACO consultada. Recomenda-se diferenciar explicitamente 'figo fresco' (🟡, moderação) de 'figo seco' (🔴, dado não numérico localizado nesta consulta — validar com TBCA).",
+      "tecnica_preparo": "Não aplicável ao fruto fresco.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., item 194, p.38-39", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Fruta-do-conde (Pinha)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 283,
+      "justificativa": "TACO (item 246, 'Pinha, crua'): 283 mg K/100g. Confirma classificação de restrição.",
+      "observacoes": "Nenhuma divergência relevante.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., item 246, p.40-41"]
+    },
+    {
+      "nome": "Goiaba",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 198,
+      "justificativa": "TACO: Goiaba branca com casca crua (item 197) = 220 mg/100g; Goiaba vermelha com casca crua (item 200) = 198 mg/100g. Valores moderados-altos.",
+      "observacoes": "Documento de origem classifica como contraindicada; valor TACO sustenta pelo menos 🟡/🔴 conforme variedade e porção — mantido 🟡 pela borda do valor numérico, mas com forte recomendação de controle de porção.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., itens 197 e 200, p.38-39"]
+    },
+    {
+      "nome": "Graviola",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 250,
+      "justificativa": "TACO (item 201): 250 mg K/100g (fruta crua); polpa congelada (item 202) = 170 mg/100g.",
+      "observacoes": "Confirma restrição para a fruta crua; polpa congelada apresenta valor mais baixo (170 mg/100g) — se disponível apenas como polpa, poderia ser reavaliada para 🟡 conforme julgamento clínico.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., itens 201-202, p.38-39"]
+    },
+    {
+      "nome": "Jaca",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 234,
+      "justificativa": "TACO (item 204): 234 mg K/100g. Valor alto, próximo ao corte, confirma restrição.",
+      "observacoes": "Nenhuma divergência relevante.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., item 204, p.38-39"]
+    },
+    {
+      "nome": "Kiwi",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 269,
+      "justificativa": "TACO (item 207): 269 mg K/100g. Confirma restrição.",
+      "observacoes": "Nenhuma divergência relevante.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi", "Morango"],
+      "referencias": ["TACO 4ª ed., item 207, p.38-39"]
+    },
+    {
+      "nome": "Laranja (Baía / da Terra / Pera)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 174,
+      "justificativa": "TACO: Laranja Baía crua (item 208) = 174 mg/100g; Laranja da Terra crua (item 210) = 173 mg/100g; Laranja Pera crua (item 214) = 163 mg/100g; Laranja Valência crua (item 216) = 158 mg/100g.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: o documento de origem classifica genericamente 'Laranja pera' e 'Laranja baiana' como contraindicadas (🔴), mas os valores TACO (158-174 mg/100g) situam essas variedades na faixa 🟡, mais baixos que os de laranja-lima (130, que o documento classifica como permitida) e substancialmente menores que os de frutas claramente 🔴 (kiwi 269, maracujá 338). Recomenda-se revisão clínica desta classificação com base nos números reais antes de manter laranja pera/baiana como totalmente contraindicadas.",
+      "tecnica_preparo": "Consumir a fruta inteira (com bagaço) em vez de suco reduz a quantidade ingerida por porção prática.",
+      "substituicoes": ["Laranja-lima", "Maçã", "Limão"],
+      "referencias": ["TACO 4ª ed., itens 208, 210, 214, 216, p.38-39", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Mamão (Formosa)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 222,
+      "justificativa": "TACO (item 225): 222 mg K/100g.",
+      "observacoes": "Nenhuma.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., item 225, p.40-41"]
+    },
+    {
+      "nome": "Mamão (Papaia)",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 126,
+      "justificativa": "TACO (item 226): 126 mg K/100g — sensivelmente mais baixo que o mamão Formosa.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: o documento de origem classifica 'Mamão' genericamente como contraindicado, sem diferenciar variedades. A TACO mostra diferença relevante entre Mamão Formosa (222 mg/100g, 🟡) e Mamão Papaia (126 mg/100g, 🟢). Recomenda-se que o aplicativo diferencie explicitamente as duas variedades na busca inteligente, evitando generalização incorreta.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra"],
+      "referencias": ["TACO 4ª ed., item 226, p.40-41", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Maracujá",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 338,
+      "justificativa": "TACO (item 232): 338 mg K/100g (polpa/fruto cru). Valor bastante elevado; confirma restrição.",
+      "observacoes": "Suco/polpa congelada (item 233) apresenta 228 mg/100g, ainda alto.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Abacaxi"],
+      "referencias": ["TACO 4ª ed., itens 232-233, p.40-41"]
+    },
+    {
+      "nome": "Melão",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 216,
+      "justificativa": "TACO (item 236): 216 mg K/100g.",
+      "observacoes": "Documento de origem classifica como contraindicado; valor numérico posiciona-o mais adequadamente em 🟡 (moderação/porção controlada) do que em 🔴 absoluto — sujeito a revisão clínica.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Melancia", "Maçã", "Pêra"],
+      "referencias": ["TACO 4ª ed., item 236, p.40-41", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Mexerica / Tangerina",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 131,
+      "justificativa": "TACO: Tangerina Poncã crua (item 251) = 131 mg/100g; Mexerica Rio crua (item 238) = 125 mg/100g; Mexerica Murcote crua (item 237) = 159 mg/100g.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: documento de origem classifica 'Mexerica' e 'Tangerina' como contraindicadas, mas os valores TACO (125-159 mg/100g) são baixos a moderados — comparáveis ou inferiores a frutas classificadas 🟢 no próprio documento (ex.: caqui 164, banana maçã 264). Recomenda-se revisão clínica desta classificação.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Laranja-lima", "Maçã"],
+      "referencias": ["TACO 4ª ed., itens 237-238, 251, p.38-41", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Uva",
+      "categoria_alimentar": "Fruta",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 162,
+      "justificativa": "TACO: Uva Itália crua (item 256) = 162 mg/100g; Uva Rubi crua (item 257) = 159 mg/100g.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: documento de origem classifica uva como contraindicada; os valores TACO (159-162 mg/100g) situam-na na faixa 🟡 (moderação), não claramente 🔴. Recomenda-se controle rigoroso de porção (uva costuma ser consumida em grandes quantidades por unidade pequena, o que eleva a carga total facilmente) — a restrição pode ser mais uma questão de porção habitual do que de concentração por 100g.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Maçã", "Pêra", "Morango (moderação)"],
+      "referencias": ["TACO 4ª ed., itens 256-257, p.40-41", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Água de coco (ver Bebidas)",
+      "nota": "Ver entrada em 'Bebidas' acima."
+    },
 
-.togglebtns{display:flex; gap:8px;}
-.togglebtns .opt{flex:1; text-align:center; padding:10px; border-radius:11px; border:1px solid var(--border); background:var(--surface); font-size:13.5px; cursor:pointer; color:var(--text-dim);}
-.togglebtns .opt.on{background:var(--accent-grad); color:#0A0D14; font-weight:600; border-color:transparent;}
-html[data-theme="comfort"] .togglebtns .opt.on{color:#fff;}
+    {
+      "nome": "Alface",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 136,
+      "justificativa": "TACO: Alface americana crua (item 77) = 136 mg/100g; alface crespa crua (item 78) = 267 mg/100g; alface lisa crua (item 79) = 349 mg/100g; alface roxa crua (item 80) = 308 mg/100g.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: há grande variação entre cultivares de alface na TACO — a americana é baixa (136 mg/100g, 🟢), mas crespa, lisa e roxa apresentam valores substancialmente mais altos (267-349 mg/100g, faixa 🔴). O documento de origem lista 'Alface' genericamente como permitida sem diferenciar cultivar. Recomenda-se que o aplicativo especifique a cultivar (alface americana preferencialmente) e alerte para a variação entre tipos.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Agrião (moderação)", "Repolho"],
+      "referencias": ["TACO 4ª ed., itens 77-80, p.30-31", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Agrião",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 218,
+      "justificativa": "TACO (item 75): 218 mg K/100g.",
+      "observacoes": "Documento de origem lista como permitida; valor TACO indica moderação/controle de porção (folhas costumam ter porção pequena, o que atenua o impacto absoluto).",
+      "tecnica_preparo": "Não aplicável (folha crua em salada).",
+      "substituicoes": ["Alface americana", "Repolho"],
+      "referencias": ["TACO 4ª ed., item 75, p.30-31"]
+    },
+    {
+      "nome": "Almeirão",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 369,
+      "justificativa": "TACO: Almeirão cru (item 84) = 369 mg/100g; refogado (item 85) = 315 mg/100g.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: valor bastante elevado na TACO, mesmo refogado. O documento de origem lista como 'permitida' sem restrição, o que diverge do dado quantitativo. Recomenda-se reclassificação para 🟡 ou 🟠 (com orientação de cocção em água abundante e descarte) e revisão clínica.",
+      "tecnica_preparo": "Cozinhar em água abundante e descartar a água pode reduzir o teor (padrão observado em outras hortaliças na TACO), mas não há dado 'cru vs. cozido em água com descarte' específico medido para este item — apenas cru vs. refogado.",
+      "substituicoes": ["Alface americana", "Escarola"],
+      "referencias": ["TACO 4ª ed., itens 84-85, p.32-33", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Cenoura",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 176,
+      "justificativa": "TACO: Cenoura cozida (item 109) = 176 mg/100g; crua (item 110) = 315 mg/100g. Cocção reduz o teor de potássio em cerca de 44%.",
+      "observacoes": "Diferença expressiva entre crua e cozida corrobora a orientação clínica do documento de origem sobre cocção e descarte da água.",
+      "tecnica_preparo": "Cozinhar em água abundante e descartar a água de cocção.",
+      "substituicoes": ["Chuchu", "Pepino"],
+      "referencias": ["TACO 4ª ed., itens 109-110, p.32-33"]
+    },
+    {
+      "nome": "Escarola",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "dado_nao_localizado",
+      "potassio_mg_100g": null,
+      "justificativa": "Item 'Escarola' não localizado como entrada específica na TACO 4ª edição consultada (há 'Chicória, crua', item 111, 425 mg K/100g, botanicamente próxima, mas não idêntica).",
+      "observacoes": "NÃO INVENTAR DADO: recomenda-se verificação direta na TBCA (USP) antes de classificar numericamente. Como referência aproximada de espécie próxima (chicória, mesma família), o teor tende a ser moderado-alto — usar com cautela apenas como indicação qualitativa, não como valor definitivo.",
+      "tecnica_preparo": "Se optar por manter na lista de permitidos, recomenda-se reavaliação com base em dado analítico confirmado.",
+      "substituicoes": ["Alface americana", "Repolho"],
+      "referencias": ["TACO 4ª ed. (item não encontrado); item próximo: Chicória, item 111, p.34-35", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Pepino",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 154,
+      "justificativa": "TACO (item 142): 154 mg K/100g.",
+      "observacoes": "Consistente com o Manual SBN, que cita pepino como exemplo de baixo teor de potássio (p.45).",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Chuchu", "Alface americana"],
+      "referencias": ["TACO 4ª ed., item 142, p.34-35", "Manual SBN DRC 4-5, p.45"]
+    },
+    {
+      "nome": "Pimentão",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 174,
+      "justificativa": "TACO: Pimentão verde cru (item 144) = 174 mg/100g; amarelo cru (item 143) = 221 mg/100g; vermelho cru (item 145) = 211 mg/100g.",
+      "observacoes": "DIVERGÊNCIA: variedade verde é mais baixa (174 mg, 🟢/🟡); amarela e vermelha ultrapassam 200 mg/100g (🟡). Recomenda-se especificar 'pimentão verde' preferencialmente.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Pepino", "Chuchu"],
+      "referencias": ["TACO 4ª ed., itens 143-145, p.34-35"]
+    },
+    {
+      "nome": "Repolho",
+      "categoria_alimentar": "Verdura",
+      "classificacao": "🟢 Preferir",
+      "potassio_mg_100g": 150,
+      "justificativa": "TACO: Repolho branco cru (item 149) = 150 mg/100g; roxo cru (item 150) = 328 mg/100g; roxo refogado (item 151) = 321 mg/100g.",
+      "observacoes": "DIVERGÊNCIA: repolho branco é baixo (🟢, no limite), mas repolho ROXO apresenta valor mais que o dobro (328 mg/100g, faixa 🔴/🟡). Manual SBN cita 'Repolho' genericamente como baixo potássio (p.45) sem diferenciar cor — recomenda-se especificar 'repolho branco' no aplicativo.",
+      "tecnica_preparo": "Não aplicável para repolho branco cru; para o roxo, cocção em água abundante com descarte é recomendada.",
+      "substituicoes": ["Alface americana", "Pepino"],
+      "referencias": ["TACO 4ª ed., itens 149-151, p.34-35", "Manual SBN DRC 4-5, p.45"]
+    },
 
-.check-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
-.check{display:flex; align-items:center; gap:9px; padding:10px 11px; border-radius:11px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-size:13.5px; color:var(--text-dim);}
-.check.on{border-color:var(--accent); background:var(--accent-soft); color:var(--text); font-weight:500;}
-.check .box{width:16px; height:16px; border-radius:5px; border:1.5px solid var(--text-faint); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px;}
-.check.on .box{background:var(--accent-grad); border-color:transparent; color:#fff;}
+    {
+      "nome": "Abóbora",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 351,
+      "potassio_mg_100g_cozido": 199,
+      "reducao_percentual_cocção": "~43%",
+      "justificativa": "TACO: Abóbora cabotian crua (item 65) = 351 mg K/100g; cozida (item 64) = 199 mg K/100g. Redução de aproximadamente 43% com a cocção em água, sustentando numericamente a orientação de preparo do documento de origem e do Manual SBN.",
+      "observacoes": "Mesmo cozida, o valor (199 mg/100g) permanece na faixa 🟡 alta — reforça a necessidade de controle de porção mesmo após o preparo adequado.",
+      "tecnica_preparo": "Cortar em pedaços médios, cozinhar em água abundante sem tampa por 5-10 minutos, escorrer e descartar a água de cocção (BRASPEN/SBN). Quando indicado pelo protocolo institucional, realizar dupla cocção.",
+      "substituicoes": ["Chuchu (com preparo)", "Cenoura (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 64-65, p.30-31", "Manual SBN DRC 4-5, p.43", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Abobrinha",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 253,
+      "potassio_mg_100g_cozido": 126,
+      "reducao_percentual_cocção": "~50%",
+      "justificativa": "TACO: Abobrinha italiana crua (item 71) = 253 mg/100g; cozida (item 70) = 126 mg/100g. Redução de ~50% com cocção em água — dado numérico que sustenta diretamente a orientação clínica de preparo.",
+      "observacoes": "Após cocção adequada, valor cai para faixa 🟢/🟡 (126 mg/100g).",
+      "tecnica_preparo": "Cozinhar em água abundante, sem tampa, por 5-10 minutos; escorrer e descartar a água de cocção.",
+      "substituicoes": ["Chuchu (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 70-71, p.30-31", "Manual SBN DRC 4-5, p.43"]
+    },
+    {
+      "nome": "Batata (inglesa)",
+      "categoria_alimentar": "Legume/Hortaliça (tubérculo)",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 302,
+      "potassio_mg_100g_cozido": 161,
+      "reducao_percentual_cocção": "~47%",
+      "justificativa": "TACO: Batata inglesa crua (item 92) = 302 mg/100g; cozida (item 91) = 161 mg/100g. Redução de ~47%, muito próxima da estimativa clínica de '~50%' citada no documento de origem e no Manual SBN (p.43-44). Batata frita (item 93) mantém valor alto (489 mg/100g) — fritura NÃO reduz potássio como a fervura em água.",
+      "observacoes": "Exatamente o exemplo dado no documento de origem do projeto ('Batata' — resultado 🟡 permitida com preparo específico). Dado quantitativo da TACO confirma e reforça a recomendação qualitativa.",
+      "tecnica_preparo": "Descascar, cortar em cubos, cozinhar em bastante água (sem tampa), descartar a água da cocção; repetir o processo (dupla cocção) se indicado pelo protocolo institucional. NÃO fritar como método de redução — fritura não reduz o teor de potássio.",
+      "substituicoes": ["Mandioca (com preparo)", "Cará (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 91-93, p.30-31", "Manual SBN DRC 4-5, p.43-44", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Berinjela",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 205,
+      "potassio_mg_100g_cozido": 105,
+      "reducao_percentual_cocção": "~49%",
+      "justificativa": "TACO: Berinjela crua (item 96) = 205 mg/100g; cozida (item 95) = 105 mg/100g. Redução de ~49%.",
+      "observacoes": "Após cocção, valor situa-se em faixa 🟢/🟡.",
+      "tecnica_preparo": "Cozinhar em água abundante, sem tampa, escorrer e descartar a água.",
+      "substituicoes": ["Abobrinha (com preparo)", "Chuchu (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 95-96, p.30-31"]
+    },
+    {
+      "nome": "Beterraba",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 375,
+      "potassio_mg_100g_cozido": 245,
+      "reducao_percentual_cocção": "~35%",
+      "justificativa": "TACO: Beterraba crua (item 98) = 375 mg/100g; cozida (item 97) = 245 mg/100g. Redução de ~35% — menor que a de outros vegetais, e o valor cozido permanece próximo ao limite de 🔴.",
+      "observacoes": "Mesmo após cocção adequada, valor (245 mg/100g) é o mais alto entre os itens 🟠 deste banco — reforçar controle de porção pequena mesmo após preparo correto.",
+      "tecnica_preparo": "Cozinhar em água abundante e descartar a água. Considerar dupla cocção conforme protocolo institucional, dado o valor residual ainda elevado.",
+      "substituicoes": ["Cenoura (com preparo)", "Chuchu (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 97-98, p.30-31"]
+    },
+    {
+      "nome": "Brócolis",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 322,
+      "potassio_mg_100g_cozido": 119,
+      "reducao_percentual_cocção": "~63%",
+      "justificativa": "TACO: Brócolis cru (item 101) = 322 mg/100g; cozido (item 100) = 119 mg/100g. Redução expressiva (~63%), uma das maiores observadas entre os vegetais tabelados.",
+      "observacoes": "Após cocção, valor cai bem para dentro da faixa 🟢.",
+      "tecnica_preparo": "Cozinhar em água abundante, sem tampa, escorrer e descartar a água.",
+      "substituicoes": ["Couve-flor (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 100-101, p.32-33"]
+    },
+    {
+      "nome": "Chuchu",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 126,
+      "potassio_mg_100g_cozido": 54,
+      "reducao_percentual_cocção": "~57%",
+      "justificativa": "TACO: Chuchu cru (item 113) = 126 mg/100g; cozido (item 112) = 54 mg/100g. Já é o vegetal com menor teor mesmo cru; após cocção, torna-se um dos mais baixos do banco. Consistente com o exemplo citado no Manual SBN ('Chuchu cozido em água fervente e desprezando-se a água da fervura', p.45).",
+      "observacoes": "Excelente opção mesmo antes da cocção; a técnica de preparo reforça ainda mais a segurança.",
+      "tecnica_preparo": "Cozinhar em água abundante, sem tampa, escorrer e descartar a água.",
+      "substituicoes": ["Abobrinha (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 112-113, p.32-33", "Manual SBN DRC 4-5, p.45"]
+    },
+    {
+      "nome": "Couve-flor",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 256,
+      "potassio_mg_100g_cozido": 80,
+      "reducao_percentual_cocção": "~69%",
+      "justificativa": "TACO: Couve-flor crua (item 117) = 256 mg/100g; cozida (item 118) = 80 mg/100g. Maior redução percentual observada entre os itens deste banco (~69%).",
+      "observacoes": "Após cocção adequada, um dos vegetais mais seguros da categoria 🟠.",
+      "tecnica_preparo": "Cozinhar em água abundante, sem tampa, escorrer e descartar a água.",
+      "substituicoes": ["Brócolis (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 117-118, p.32-33"]
+    },
+    {
+      "nome": "Couve-manteiga",
+      "categoria_alimentar": "Legume/Hortaliça (folha)",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 403,
+      "potassio_mg_100g_refogado": 315,
+      "reducao_percentual_cocção": "~22% (refogada, sem descarte de água)",
+      "justificativa": "TACO: Couve manteiga crua (item 115) = 403 mg/100g; refogada (item 116) = 315 mg/100g. IMPORTANTE: a redução observada é apenas para o método 'refogado', que NÃO envolve fervura em água abundante com descarte. Não há na TACO um dado específico de 'couve cozida em água abundante com descarte', que teria redução maior (padrão observado em outros vegetais folhosos/de raiz).",
+      "observacoes": "DIVERGÊNCIA/LIMITAÇÃO METODOLÓGICA: o valor residual mesmo refogado (315 mg/100g) permanece ALTO, e o método usual de preparo doméstico (refogar) reduz pouco o potássio comparado à fervura com descarte de água. Recomenda-se orientar especificamente cocção em água abundante (não refogado) com descarte da água para este item, e reforçar controle rigoroso de porção mesmo assim.",
+      "tecnica_preparo": "Cozinhar em água abundante (não apenas refogar), sem tampa, escorrer e descartar a água; dupla cocção conforme protocolo institucional.",
+      "substituicoes": ["Alface americana", "Repolho branco"],
+      "referencias": ["TACO 4ª ed., itens 115-116, p.32-33"]
+    },
+    {
+      "nome": "Espinafre",
+      "categoria_alimentar": "Legume/Hortaliça (folha)",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 336,
+      "potassio_mg_100g_refogado": 149,
+      "reducao_percentual_cocção": "~56% (refogado)",
+      "justificativa": "TACO (Espinafre, Nova Zelândia): cru (item 119) = 336 mg/100g; refogado (item 120) = 149 mg/100g. Redução relevante mesmo no método refogado.",
+      "observacoes": "Nota: a TACO cataloga a variedade 'Espinafre, Nova Zelândia' — variedade botanicamente distinta do espinafre comum europeu; teores podem diferir de outras bases de dados.",
+      "tecnica_preparo": "Cozinhar em água abundante, escorrer e descartar a água; dupla cocção se indicado.",
+      "substituicoes": ["Couve-manteiga (com preparo, controlado)", "Alface americana"],
+      "referencias": ["TACO 4ª ed., itens 119-120, p.32-33"]
+    },
+    {
+      "nome": "Mandioca",
+      "categoria_alimentar": "Legume/Hortaliça (tubérculo)",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 208,
+      "potassio_mg_100g_cozido": 100,
+      "reducao_percentual_cocção": "~52%",
+      "justificativa": "TACO: Mandioca crua (item 130) = 208 mg/100g; cozida (item 129) = 100 mg/100g. Redução de ~52%, e também citada no Manual SBN como exemplo de alimento com baixo potássio quando cozida (p.45) e como opção de alta energia/baixa proteína para pacientes renais (p.41).",
+      "observacoes": "Após cocção adequada, um dos tubérculos mais seguros da categoria.",
+      "tecnica_preparo": "Cozinhar em água abundante, escorrer e descartar a água.",
+      "substituicoes": ["Batata inglesa (com preparo)", "Cará (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 129-130, p.32-33", "Manual SBN DRC 4-5, p.41 e 45"]
+    },
+    {
+      "nome": "Mandioquinha (Batata Baroa)",
+      "categoria_alimentar": "Legume/Hortaliça (tubérculo)",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 505,
+      "potassio_mg_100g_cozido": 258,
+      "reducao_percentual_cocção": "~49%",
+      "justificativa": "TACO: Batata baroa crua (item 87) = 505 mg/100g (um dos valores mais altos entre tubérculos tabelados); cozida (item 86) = 258 mg/100g.",
+      "observacoes": "IMPORTANTE: mesmo após cocção com redução de ~49%, o valor residual (258 mg/100g) permanece ACIMA do corte de 250 mg adotado para 🔴 neste banco. Recomenda-se avaliação clínica cuidadosa antes de manter este item como 'permitido com preparo' — pode ser necessário reclassificar para 🔴 mesmo com técnica de preparo adequada, ou restringir a porções muito pequenas.",
+      "tecnica_preparo": "Cozinhar em água abundante, escorrer e descartar a água; considerar dupla cocção. Mesmo assim, valor residual é o mais alto entre os tubérculos deste banco.",
+      "substituicoes": ["Mandioca (com preparo)", "Batata inglesa (com preparo)"],
+      "referencias": ["TACO 4ª ed., itens 86-87, p.30-31"]
+    },
+    {
+      "nome": "Quiabo",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 249,
+      "potassio_mg_100g_cozido": null,
+      "justificativa": "TACO: Quiabo cru (item 147) = 249 mg/100g. Não há entrada específica de 'quiabo cozido' na TACO consultada.",
+      "observacoes": "DADO PARCIAL: sem valor de quiabo cozido na TACO, não é possível quantificar a redução esperada com a cocção — assume-se qualitativamente (por analogia a outros vegetais da mesma tabela) que a fervura em água abundante com descarte reduziria o teor, mas isso NÃO foi confirmado numericamente e não deve ser apresentado como dado. Recomenda-se buscar esse valor na TBCA antes de firmar a classificação numérica pós-cocção.",
+      "tecnica_preparo": "Cozinhar em água abundante, escorrer e descartar a água (recomendação clínica padrão, sem confirmação numérica específica na fonte consultada).",
+      "substituicoes": ["Vagem (com preparo)", "Chuchu (com preparo)"],
+      "referencias": ["TACO 4ª ed., item 147, p.34-35"]
+    },
+    {
+      "nome": "Vagem",
+      "categoria_alimentar": "Legume/Hortaliça",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 208,
+      "potassio_mg_100g_cozido": null,
+      "justificativa": "TACO: Vagem crua (item 162) = 208 mg/100g. Não há entrada específica de 'vagem cozida' na TACO consultada.",
+      "observacoes": "DADO PARCIAL: sem valor pós-cocção específico na TACO. Recomenda-se validação com TBCA.",
+      "tecnica_preparo": "Cozinhar em água abundante, escorrer e descartar a água (recomendação clínica, sem confirmação numérica na fonte consultada).",
+      "substituicoes": ["Chuchu (com preparo)", "Quiabo (com preparo)"],
+      "referencias": ["TACO 4ª ed., item 162, p.34-35"]
+    },
+    {
+      "nome": "Acelga",
+      "categoria_alimentar": "Legume/Hortaliça (folha)",
+      "classificacao": "🟠 Permitido apenas com preparo específico",
+      "potassio_mg_100g_cru": 240,
+      "potassio_mg_100g_cozido": null,
+      "justificativa": "TACO: Acelga crua (item 74) = 240 mg/100g. Não há entrada de 'acelga cozida' na TACO consultada.",
+      "observacoes": "DADO PARCIAL — recomenda-se validação com TBCA para valor pós-cocção.",
+      "tecnica_preparo": "Cozinhar em água abundante, escorrer e descartar a água (recomendação clínica, sem confirmação numérica na fonte consultada).",
+      "substituicoes": ["Alface americana", "Repolho branco"],
+      "referencias": ["TACO 4ª ed., item 74, p.30-31"]
+    },
 
-.calc-banner{display:flex; gap:10px; align-items:center; background:var(--accent-soft); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:14px;}
-.calc-banner .num{font-size:22px; font-weight:700; line-height:1;}
-.calc-banner .lbl{font-size:11px; color:var(--text-dim); margin-top:2px;}
-.calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
-.calc-item{background:var(--surface); border:1px solid var(--border-soft); border-radius:12px; padding:10px 12px;}
-.calc-item .k{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
-.calc-item .v{font-size:15px; font-weight:600; margin-top:2px;}
-.calc-item.wide{grid-column:1/-1;}
-.protocol-note{font-size:11.5px; color:var(--text-dim); background:var(--surface); border:1px dashed var(--border); border-radius:10px; padding:9px 11px; margin-bottom:14px; line-height:1.5;}
-.protocol-note b{color:var(--text);}
+    {
+      "nome": "Feijão (todos os tipos)",
+      "categoria_alimentar": "Leguminosa",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g_cozido": 255,
+      "justificativa": "TACO (valores cozidos, mg/100g): Feijão carioca cozido (item 561) = 255; Feijão preto cozido (item 567) = 256; Feijão fradinho cozido (item 563) = 253; Feijão jalo cozido (item 565) = 348; Feijão rajado cozido (item 569) = 315; Feijão rosinha cozido (item 571) = 241; Feijão roxo cozido (item 573) = 268. Mesmo já cozido (não há redução adicional aplicável, pois o feijão é consumido no próprio caldo/grão), os valores situam-se consistentemente na faixa 🔴.",
+      "observacoes": "Diferente de hortaliças, a técnica de cocção do feijão não elimina o potássio da mesma forma (o grão absorve água mas mantém os minerais internamente); por isso a categoria 🟠 não se aplica aqui — confirma-se a classificação 🔴 do documento de origem.",
+      "tecnica_preparo": "Não há técnica de preparo doméstico validada na literatura consultada capaz de reduzir significativamente o potássio do feijão cozido a ponto de reclassificá-lo.",
+      "substituicoes": ["Nenhuma leguminosa equivalente recomendada nesta dieta; consultar nutricionista para fonte proteica alternativa de baixo potássio."],
+      "referencias": ["TACO 4ª ed., itens 561-574, p.62-63"]
+    },
+    {
+      "nome": "Ervilha",
+      "categoria_alimentar": "Leguminosa",
+      "classificacao": "dado_nao_localizado",
+      "potassio_mg_100g": null,
+      "justificativa": "Item 'Ervilha' (fresca/seca) não localizado como entrada específica na TACO 4ª edição consultada nesta sessão.",
+      "observacoes": "NÃO INVENTAR DADO. Recomenda-se busca específica na TBCA. Classificação qualitativa 🔴 mantida por consenso do documento de origem (leguminosa, grupo tradicionalmente rico em potássio), mas sem lastro numérico direto nesta consulta.",
+      "tecnica_preparo": "Não aplicável / não determinado nesta consulta.",
+      "substituicoes": ["Consultar nutricionista para fonte proteica alternativa."],
+      "referencias": ["Documento de origem do projeto (classificação qualitativa apenas)"]
+    },
+    {
+      "nome": "Grão-de-bico",
+      "categoria_alimentar": "Leguminosa",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g_cru": 1116,
+      "justificativa": "TACO (item 575, cru): 1116 mg K/100g. Valor muito elevado mesmo cru; não há entrada de grão-de-bico cozido na TACO consultada, mas o valor cru já confirma amplamente a restrição.",
+      "observacoes": "Um dos maiores valores de potássio entre todos os alimentos consultados neste banco.",
+      "tecnica_preparo": "Não recomendado para dieta hipopotássica independentemente do preparo.",
+      "substituicoes": ["Consultar nutricionista para fonte proteica alternativa."],
+      "referencias": ["TACO 4ª ed., item 575, p.62-63"]
+    },
+    {
+      "nome": "Soja",
+      "categoria_alimentar": "Leguminosa",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 1922,
+      "justificativa": "TACO: Soja farinha (item 581) = 1922 mg/100g; extrato solúvel em pó (item 583) = 1607 mg/100g. Valores extremamente altos para as formas processadas em pó.",
+      "observacoes": "DIVERGÊNCIA IMPORTANTE A REGISTRAR: 'Soja, queijo (tofu)' (item 584) apresenta valor MUITO mais baixo — 182 mg K/100g — o que o posicionaria em 🟡, não 🔴. O documento de origem restringe 'Soja' genericamente, sem diferenciar apresentação. Recomenda-se que o aplicativo trate 'tofu' como item separado (classificação 🟡, ver entrada própria), evitando restringir incorretamente uma opção de menor teor de potássio.",
+      "tecnica_preparo": "Não aplicável para farinha/extrato em pó (não recomendados nesta dieta).",
+      "substituicoes": ["Tofu (com moderação — ver entrada própria)"],
+      "referencias": ["TACO 4ª ed., itens 581 e 583-584, p.62-63"]
+    },
+    {
+      "nome": "Tofu (queijo de soja)",
+      "categoria_alimentar": "Leguminosa (derivado)",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100g": 182,
+      "justificativa": "TACO (item 584): 182 mg K/100g — substancialmente mais baixo que outras formas de soja (farinha 1922 mg, extrato em pó 1607 mg).",
+      "observacoes": "Ver divergência registrada na entrada 'Soja' acima. Item não constava explicitamente na lista do documento de origem, mas está sendo adicionado por relevância clínica (fonte proteica de menor potássio dentro do grupo das leguminosas).",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Não aplicável"],
+      "referencias": ["TACO 4ª ed., item 584, p.62-63"]
+    },
 
-nav.tabbar{position:fixed; bottom:0; left:0; right:0; z-index:40; backdrop-filter:blur(20px); background:rgba(10,13,20,0.72); border-top:1px solid var(--border-soft); display:flex; padding:8px 10px calc(8px + env(safe-area-inset-bottom));}
-html[data-theme="comfort"] nav.tabbar{background:rgba(243,236,216,0.85);}
-nav.tabbar button{flex:1; background:none; border:none; color:var(--text-faint); display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; padding:6px 2px; border-radius:12px; cursor:pointer;}
-nav.tabbar button .ic{font-size:19px;}
-nav.tabbar button.active{color:var(--accent);}
+    {
+      "nome": "Amendoim",
+      "categoria_alimentar": "Oleaginosa",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 580,
+      "justificativa": "TACO: Amendoim grão cru (item 557) = 580 mg/100g; torrado salgado (item 558) = 496 mg/100g. Valores altos, confirmam restrição do documento de origem.",
+      "observacoes": "Nenhuma divergência relevante.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Nenhuma oleaginosa recomendada nesta dieta."],
+      "referencias": ["TACO 4ª ed., itens 557-558, p.62-63"]
+    },
+    {
+      "nome": "Castanhas (Castanha-de-Caju / Castanha-do-Brasil)",
+      "categoria_alimentar": "Oleaginosa",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 651,
+      "justificativa": "TACO: Castanha-do-Brasil crua (item 589) = 651 mg/100g; Castanha-de-caju torrada salgada (item 588) = 671 mg/100g. Ambas com valores muito elevados.",
+      "observacoes": "Nenhuma divergência relevante.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Nenhuma oleaginosa recomendada nesta dieta."],
+      "referencias": ["TACO 4ª ed., itens 588-589, p.62-63"]
+    },
+    {
+      "nome": "Amêndoas",
+      "categoria_alimentar": "Oleaginosa",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 640,
+      "justificativa": "TACO (item 587, torrada salgada): 640 mg K/100g.",
+      "observacoes": "Nenhuma divergência relevante.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Nenhuma oleaginosa recomendada nesta dieta."],
+      "referencias": ["TACO 4ª ed., item 587, p.62-63"]
+    },
+    {
+      "nome": "Avelã",
+      "categoria_alimentar": "Oleaginosa",
+      "classificacao": "dado_nao_localizado",
+      "potassio_mg_100g": null,
+      "justificativa": "Item 'Avelã' não localizado como entrada específica na TACO 4ª edição consultada nesta sessão.",
+      "observacoes": "NÃO INVENTAR DADO. Classificação qualitativa 🔴 mantida por consenso do documento de origem e por analogia ao grupo das oleaginosas (tipicamente ricas em potássio), mas sem lastro numérico direto nesta consulta. Recomenda-se busca na TBCA ou USDA FoodData Central para valor específico.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Nenhuma oleaginosa recomendada nesta dieta."],
+      "referencias": ["Documento de origem do projeto (classificação qualitativa apenas)"]
+    },
+    {
+      "nome": "Pinhão",
+      "categoria_alimentar": "Oleaginosa/Semente",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g_cozido": 727,
+      "justificativa": "TACO (item 595, cozido): 727 mg K/100g — valor muito alto mesmo já cozido.",
+      "observacoes": "Nenhuma divergência relevante.",
+      "tecnica_preparo": "Não aplicável (cocção não reduz suficientemente o teor).",
+      "substituicoes": ["Nenhuma oleaginosa recomendada nesta dieta."],
+      "referencias": ["TACO 4ª ed., item 595, p.64-65"]
+    },
+    {
+      "nome": "Coco (polpa)",
+      "categoria_alimentar": "Oleaginosa/Fruta",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 354,
+      "justificativa": "TACO (item 590, cru): 354 mg K/100g.",
+      "observacoes": "Diferenciar de 'água de coco' (162 mg/100ml — ver entrada em Bebidas), que tem valor numérico mais baixo mas também é restrita por outros motivos (ver divergência já registrada).",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Nenhuma oleaginosa recomendada nesta dieta."],
+      "referencias": ["TACO 4ª ed., item 590, p.62-63"]
+    },
 
-.gen-block{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:13px 14px; font-size:13.5px; line-height:1.75; white-space:pre-wrap; color:var(--text); font-variant-numeric:tabular-nums; margin-bottom:10px; min-height:40px;}
-.copybtn{display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:11px; border-radius:11px; border:none; background:var(--accent-grad); color:#fff; font-weight:600; font-size:13.5px; cursor:pointer;}
-html[data-theme="dark"] .copybtn{color:#0A0D14;}
-.editbtn{background:none; border:1px solid var(--border); color:var(--text-dim); padding:8px 12px; border-radius:10px; font-size:12px; cursor:pointer; margin-bottom:10px;}
-
-.tagrow{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px;}
-.tagbtn{padding:7px 12px; border-radius:9px; border:1px solid var(--border); background:var(--surface); font-size:12px; color:var(--text-dim); cursor:pointer;}
-
-.addbar{display:flex; gap:8px; margin-top:10px;}
-.addbar input{flex:1;}
-.addbar button{width:44px; border-radius:11px; border:none; background:var(--accent-grad); color:#fff; font-size:19px; cursor:pointer;}
-html[data-theme="dark"] .addbar button{color:#0A0D14;}
-.listrow{display:flex; align-items:center; justify-content:space-between; background:var(--surface); border:1px solid var(--border-soft); border-radius:10px; padding:9px 12px; margin-bottom:7px; font-size:13px;}
-.listrow .rm{color:var(--text-faint); cursor:pointer; font-size:15px; padding:0 4px;}
-
-.leito-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border-soft); border-radius:14px; padding:13px 14px; margin-bottom:10px; cursor:pointer;}
-.leito-num{width:44px; height:44px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:var(--accent);}
-.leito-info{flex:1;}
-.leito-info .l1{font-size:14px; font-weight:600;}
-.leito-info .l2{font-size:11.5px; color:var(--text-faint); margin-top:2px;}
-.status-pill{font-size:10.5px; padding:4px 9px; border-radius:20px; font-weight:600;}
-.status-pill.pend{background:rgba(255,122,133,0.15); color:var(--danger);}
-.status-pill.hoje{background:rgba(95,224,166,0.15); color:var(--ok);}
-
-.toast{position:fixed; bottom:96px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface-strong); backdrop-filter:blur(14px); border:1px solid var(--border); color:var(--text); padding:11px 20px; border-radius:30px; font-size:13px; font-weight:500; opacity:0; transition:.25s; z-index:60; box-shadow:var(--shadow); display:flex; align-items:center; gap:8px;}
-.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
-
-.empty{text-align:center; padding:40px 20px; color:var(--text-faint); font-size:13.5px;}
-textarea{min-height:70px; resize:vertical;}
-.hidden{display:none !important;}
-.readonly-note{font-size:11px; color:var(--text-faint); margin-top:-9px; margin-bottom:14px; display:flex; align-items:center; gap:5px;}
-
-.meal-row{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid var(--border-soft);}
-.meal-row:last-child{border-bottom:none;}
-.meal-row .mlabel{font-size:13px; font-weight:500; width:110px; flex-shrink:0;}
-.meal-pct{display:flex; gap:5px; flex:1;}
-.meal-pct .p{flex:1; text-align:center; padding:6px 0; border-radius:8px; border:1px solid var(--border); font-size:11.5px; color:var(--text-faint); cursor:pointer;}
-.meal-pct .p.on{background:var(--accent-grad); color:#fff; border-color:transparent; font-weight:600;}
-html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
-
-.chartwrap{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:10px;}
-.chart-note{font-size:10.5px; color:var(--text-faint); text-align:center; margin-top:6px; line-height:1.5;}
-</style>
-</head>
-<body>
-
-<header>
-  <div class="hdr-top">
-    <div class="brand">
-      <div class="brand-mark">🏥</div>
-      <div>
-        <div class="brand-name">Nutri Hospital</div>
-        <div class="brand-sub">Assistente de visita nutricional</div>
-      </div>
-    </div>
-    <button class="theme-toggle" id="themeToggle">🌙</button>
-  </div>
-  <div class="hdr-meta">
-    <div class="chip"><div class="k">Leito</div><div class="v" id="hdrLeito">—</div></div>
-    <div class="chip"><div class="k">Data da visita</div><div class="v" id="hdrData">—</div></div>
-    <div class="chip"><div class="k">Nível</div><div class="v" id="hdrNivel"><span class="badge primario"><span class="dot"></span>—</span></div></div>
-  </div>
-</header>
-
-<main>
-
-<!-- TAB 1 : FORMULÁRIO -->
-<section id="tab-formulario">
-
-  <div class="card">
-    <div class="card-title"><span class="ic">🛏️</span> Identificação</div>
-    <div class="row2">
-      <div class="field">
-        <label>Leito (3 dígitos)</label>
-        <input type="text" id="fLeito" maxlength="3" inputmode="numeric" placeholder="317">
-      </div>
-      <div class="field">
-        <label>Andar</label>
-        <input type="text" id="fAndar" placeholder="Ex: 4º andar">
-      </div>
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Data da visita</label>
-        <input type="text" id="fData" disabled>
-      </div>
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Data de nascimento</label>
-        <input type="date" id="fNascimento">
-      </div>
-      <div class="field">
-        <label>Sexo</label>
-        <div class="togglebtns" id="fSexo">
-          <div class="opt" data-v="F">Feminino</div>
-          <div class="opt" data-v="M">Masculino</div>
-        </div>
-      </div>
-    </div>
-    <div class="protocol-note" id="idadeInfo">Informe a data de nascimento para o app definir automaticamente idade, faixa etária e o protocolo de triagem (STRONG Kids, NRS-2002 ou MNA).</div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">🙂</span> Estado Geral</div>
-    <div class="sub-label">Nível de consciência</div>
-    <div class="chipselect wrap" id="egConsciencia">
-      <div class="opt" data-v="Consciente">Consciente</div>
-      <div class="opt" data-v="Sonolento">Sonolento</div>
-      <div class="opt" data-v="Confusão mental">Confusão mental</div>
-      <div class="opt" data-v="Fala desconexa">Fala desconexa</div>
-      <div class="opt" data-v="Não responsivo">Não responsivo</div>
-      <div class="opt" data-v="Sedado">Sedado</div>
-    </div>
-    <div class="sub-label">Colaboração</div>
-    <div class="chipselect wrap" id="egColaboracao">
-      <div class="opt" data-v="Colaborativo">Colaborativo</div>
-      <div class="opt" data-v="Pouco colaborativo">Pouco colaborativo</div>
-      <div class="opt" data-v="Não colaborativo">Não colaborativo</div>
-    </div>
-    <div class="sub-label">Acompanhante</div>
-    <div class="togglebtns" id="egAcompanhante">
-      <div class="opt" data-v="Com acompanhante">Com acompanhante</div>
-      <div class="opt" data-v="Sem acompanhante">Sem acompanhante</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">📏</span> Antropometria<span class="tag" id="protocoloTag">—</span></div>
-    <div class="row2">
-      <div class="field"><label>Peso (kg)</label><input type="number" step="0.1" id="fPeso" placeholder="72"></div>
-      <div class="field"><label>Altura (cm)</label><input type="number" id="fAltura" placeholder="170"></div>
-    </div>
-    <div class="field"><label>PPR (perda de peso recente)</label><input type="text" id="fPPR" placeholder="Ex: 3kg em 30 dias, ou 'nega'"></div>
-    <div class="calc-grid">
-      <div class="calc-item"><div class="k">IMC</div><div class="v" id="calcIMC">—</div></div>
-      <div class="calc-item"><div class="k">Estado nutricional</div><div class="v" id="calcOMS">—</div></div>
-      <div class="calc-item hidden" id="itemZscore"><div class="k">Escore Z (IMC/idade)</div><div class="v" id="calcZ">—</div></div>
-      <div class="calc-item hidden" id="itemPercentil"><div class="k">Percentil aproximado</div><div class="v" id="calcPercentil">—</div></div>
-    </div>
-    <div id="chartArea" class="hidden">
-      <div class="sub-label">Plotagem na curva OMS (IMC por idade)</div>
-      <div class="chartwrap"><svg id="whoChart" viewBox="0 0 320 190" style="width:100%; height:auto;"></svg></div>
-      <div class="chart-note">Curvas ilustrativas para orientar a visita — não substituem as tabelas oficiais LMS da OMS para registro clínico definitivo.</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">📋</span> Triagem<span class="tag" id="protocoloTag2">—</span></div>
-    <div class="field"><label id="triResultLabel">Resultado</label><input type="text" id="fTriResultado" placeholder="Ex: Baixo risco / 3 pontos"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">🍽️</span> Dieta</div>
-    <div class="field"><label>Dieta prescrita no Tasy</label><input type="text" id="fDietaTasy" placeholder="Ex: Dieta geral"></div>
-    <div class="field"><label>Dieta após avaliação nutricional</label><input type="text" id="fDietaPos" placeholder="Ex: Dieta hipossódica"></div>
-    <div class="field">
-      <label>Dieta especial?</label>
-      <div class="togglebtns" id="dietaEspecial">
-        <div class="opt" data-v="nao">Não</div>
-        <div class="opt" data-v="sim">Sim</div>
-      </div>
-    </div>
-    <div class="field">
-      <label>Uso de caneta emagrecedora (GLP-1)?</label>
-      <div class="togglebtns" id="fCaneta">
-        <div class="opt" data-v="nao">Não</div>
-        <div class="opt" data-v="sim">Sim</div>
-      </div>
-    </div>
-    <div class="field hidden" id="canetaNomeWrap"><label>Qual medicação?</label><input type="text" id="fCanetaNome" placeholder="Ex: semaglutida, tirzepatida, liraglutida"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">🍴</span> Aceitação alimentar</div>
-    <div id="mealRows"></div>
-    <div class="field" style="margin-top:12px;"><label>Preferências</label><input type="text" id="fPreferencias" placeholder="Ex: água de coco, suco de manga"></div>
-    <div class="field"><label>Bloqueios alimentares (não gosta)</label><input type="text" id="fBloqueios" placeholder="Ex: peixe, quiabo"></div>
-    <div class="field"><label>Alergias</label><input type="text" id="fAlergias" placeholder="Ex: ovo"></div>
-    <div class="field"><label>Intolerâncias</label><input type="text" id="fIntolerancias" placeholder="Ex: lactose"></div>
-    <div class="field"><label>Sensibilidades</label><input type="text" id="fSensibilidades" placeholder="Ex: coentro"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">💩</span> Gastrointestinal</div>
-    <div class="sub-label">Sintomas</div>
-    <div class="chipselect wrap" id="fSintomas">
-      <div class="opt" data-v="Estufamento">Estufamento</div><div class="opt" data-v="Gases">Gases</div>
-      <div class="opt" data-v="Constipação">Constipação</div><div class="opt" data-v="Diarreia">Diarreia</div>
-      <div class="opt" data-v="Náusea">Náusea</div><div class="opt" data-v="Vômito">Vômito</div>
-      <div class="opt" data-v="Dor abdominal">Dor abdominal</div><div class="opt" data-v="Refluxo">Refluxo</div>
-      <div class="opt" data-v="Sem sintomas">Sem sintomas</div>
-    </div>
-    <div class="field" style="margin-top:12px;"><label>Observação gastrointestinal</label><textarea id="fObsGastro" placeholder="Ex: constipação relacionada ao uso de opioides"></textarea></div>
-
-    <div class="sub-label">Evacuação</div>
-    <div class="chipselect wrap" id="fEvacuacao">
-      <div class="opt" data-v="Presente">Presente</div><div class="opt" data-v="Ausente">Ausente</div>
-      <div class="opt" data-v="Constipada">Constipada</div><div class="opt" data-v="Diarreica">Diarreica</div>
-      <div class="opt" data-v="Irregular">Irregular</div>
-    </div>
-    <div class="row2" style="margin-top:12px;">
-      <div class="field">
-        <label>Uso de medicação p/ evacuar?</label>
-        <div class="togglebtns" id="fEvacMed">
-          <div class="opt" data-v="nao">Não</div><div class="opt" data-v="sim">Sim</div>
-        </div>
-      </div>
-      <div class="field"><label>Última evacuação</label><input type="date" id="fEvacUltimaData"></div>
-    </div>
-    <div class="field hidden" id="evacMedicamentoWrap"><label>Qual medicamento?</label><input type="text" id="fEvacMedicamento" placeholder="Ex: lactulose"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">💧</span> Hidratação e jejum</div>
-    <div class="row2">
-      <div class="field"><label>Hidratação (L/dia)</label><input type="number" step="0.1" id="fHidratacao" placeholder="1.5"></div>
-      <div class="field">
-        <label>Jejum</label>
-        <div class="togglebtns" id="fJejum">
-          <div class="opt" data-v="nao">Não</div><div class="opt" data-v="sim">Sim</div>
-        </div>
-      </div>
-    </div>
-    <div id="jejumDetalhe" class="hidden">
-      <div class="row2">
-        <div class="field"><label>Horário</label><input type="time" id="fJejumHorario"></div>
-        <div class="field"><label>Motivo</label><input type="text" id="fJejumMotivo" placeholder="Ex: exame"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">🩺</span> Comorbidades</div>
-    <div class="check-grid" id="fComorbidades">
-      <div class="check" data-v="HAS"><span class="box"></span>HAS</div>
-      <div class="check" data-v="DM"><span class="box"></span>DM</div>
-      <div class="check" data-v="Dislipidemia"><span class="box"></span>Dislipidemia</div>
-      <div class="check" data-v="IRC"><span class="box"></span>IRC</div>
-      <div class="check" data-v="DRC"><span class="box"></span>DRC</div>
-      <div class="check" data-v="ICC"><span class="box"></span>ICC</div>
-      <div class="check" data-v="DPOC"><span class="box"></span>DPOC</div>
-      <div class="check" data-v="Neoplasia"><span class="box"></span>Neoplasia</div>
-      <div class="check" data-v="Disfagia"><span class="box"></span>Disfagia</div>
-      <div class="check" data-v="Bariátrica"><span class="box"></span>Bariátrica</div>
-      <div class="check" data-v="Cirurgia de grande porte"><span class="box"></span>Cirurgia grande porte</div>
-    </div>
-    <div class="field" style="margin-top:10px;"><label>Outras</label><input type="text" id="fOutrasComorb" placeholder="Especificar"></div>
-  </div>
-
-  <div class="calc-banner">
-    <div style="flex:1;">
-      <div class="lbl">Nível de assistência (automático)</div>
-      <div class="num" id="calcNivel">Primário</div>
-    </div>
-    <div style="text-align:right;">
-      <div class="lbl">Próxima visita</div>
-      <div class="num" id="calcProxima" style="font-size:16px;">—</div>
-    </div>
-  </div>
-
-  <button class="copybtn" id="btnSalvar">💾 Salvar visita</button>
-</section>
-
-<!-- TAB 2: GESTÃO DA NUTRIÇÃO -->
-<section id="tab-gestao" class="hidden">
-  <div class="readonly-note">🔒 Gerado automaticamente a partir do Formulário da Visita</div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">📊</span> Informações Nutricionais</div>
-    <div class="gen-block" id="genInfoNutri">—</div>
-    <div class="field"><label>Observação nutricional complementar (separe por vírgula)</label><input type="text" id="fEspecClinica" placeholder="Ex: dieta hipossódica, DM tipo 2, pós-bariátrica"></div>
-    <button class="copybtn" data-copy="genInfoNutri">📋 Copiar</button>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">🍽️</span> Preferências</div>
-    <div class="sub-label">Refeições (pode marcar mais de uma)</div>
-    <div class="chipselect wrap" id="prefRefeicoes"></div>
-    <div class="row2" style="margin-top:10px;">
-      <div class="togglebtns" id="prefTipo">
-        <div class="opt on" data-v="pref">Preferência</div>
-        <div class="opt" data-v="add">Adicionar</div>
-      </div>
-    </div>
-    <div class="addbar">
-      <input type="text" id="prefAlimento" placeholder="Ex: água de coco">
-      <button id="prefAddBtn">+</button>
-    </div>
-    <div id="prefList" style="margin-top:10px;"></div>
-    <div class="gen-block" id="genPreferencias" style="margin-top:6px;">—</div>
-    <button class="copybtn" data-copy="genPreferencias">📋 Copiar</button>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">🚫</span> Bloqueios</div>
-    <textarea id="genBloqueios" class="gen-block" style="width:100%; font-family:var(--font);"></textarea>
-    <button class="copybtn" data-copy="genBloqueios" style="margin-top:10px;">📋 Copiar</button>
-  </div>
-
-  <div class="card">
-    <div class="card-title"><span class="ic">👩🏻‍🍳</span> Observações para Copeira</div>
-    <div class="tagrow">
-      <div class="tagbtn" data-txt="ADICIONAR 3 SACHÊS DE SAL">+ Sal (3 sachês)</div>
-      <div class="tagbtn" data-txt="SEM GELO">Sem gelo</div>
-      <div class="tagbtn" data-txt="SERVIR EM TEMPERATURA AMBIENTE">Temp. ambiente</div>
-      <div class="tagbtn" data-txt="AQUECER REFEIÇÃO">Aquecer</div>
-      <div class="tagbtn" data-txt="CORTAR ALIMENTOS">Cortar alimentos</div>
-      <div class="tagbtn" data-txt="ENVIAR TALHER ADAPTADO">Talher adaptado</div>
-    </div>
-    <div class="tagrow">
-      <div class="tagbtn" data-txt="VIP">🌟 VIP</div>
-      <div class="tagbtn" data-txt="RECOMENDADO">👍 Recomendado</div>
-      <div class="tagbtn" data-txt="RISCO PSIQUIÁTRICO">⚠️ Risco psiquiátrico</div>
-      <div class="tagbtn" data-txt="BARIÁTRICA">🔵 Bariátrica</div>
-    </div>
-    <textarea id="genCopeira" class="gen-block" style="width:100%; font-family:var(--font);" placeholder="Toque nos atalhos acima para adicionar..."></textarea>
-    <button class="copybtn" data-copy="genCopeira" style="margin-top:10px;">📋 Copiar</button>
-  </div>
-</section>
-
-<!-- TAB 3: EVOLUÇÃO -->
-<section id="tab-evolucao" class="hidden">
-  <div class="readonly-note">🔒 Tela de leitura — construída 100% a partir do Formulário</div>
-  <div class="card">
-    <div class="card-title"><span class="ic">📄</span> Evolução Nutricional</div>
-    <div class="gen-block" id="genEvolucao">—</div>
-    <button class="copybtn" id="btnCopiarEvolucao">📋 Copiar Evolução</button>
-    <button class="copybtn" id="btnSalvarEvolucaoCelular" style="margin-top:10px; background:var(--surface); color:var(--text); border:1px solid var(--border);">💾 Salvar evolução no celular</button>
-  </div>
-</section>
-
-<!-- TAB 4: PAINEL -->
-<section id="tab-painel" class="hidden">
-  <div class="section-label">Leitos do plantão</div>
-  <div id="painelList"></div>
-  <div class="empty hidden" id="painelEmpty">Nenhuma visita salva ainda.<br>Preencha o formulário e toque em "Salvar visita".</div>
-</section>
-
-</main>
-
-<div class="toast" id="toast"></div>
-
-<nav class="tabbar">
-  <button class="tab-btn active" data-tab="formulario"><span class="ic">📝</span>Formulário</button>
-  <button class="tab-btn" data-tab="gestao"><span class="ic">🥗</span>Gestão</button>
-  <button class="tab-btn" data-tab="evolucao"><span class="ic">📄</span>Evolução</button>
-  <button class="tab-btn" data-tab="painel"><span class="ic">🏥</span>Painel</button>
-</nav>
-
-<script>
-/* ---------------- STATE ---------------- */
-const MEALS = ['Desjejum','Colação','Almoço','Lanche da tarde','Jantar','Ceia'];
-let state = {
-  leito:'', andar:'', data:'', nascimento:'', sexo:'',
-  peso:'', altura:'', ppr:'',
-  egConsciencia:'', egColaboracao:'', egAcompanhante:'',
-  triResultado:'',
-  dietaTasy:'', dietaPos:'', dietaEspecial:'nao',
-  caneta:'nao', canetaNome:'',
-  aceitacao:{}, preferenciasTxt:'', bloqueiosTxt:'',
-  alergias:'', intolerancias:'', sensibilidades:'',
-  sintomas:[], obsGastro:'',
-  evacuacao:'', evacMed:'nao', evacMedicamento:'', evacUltimaData:'',
-  hidratacao:'', jejum:'nao', jejumHorario:'', jejumMotivo:'',
-  comorbidades:[], outrasComorb:'',
-  especClinica:'', prefItems:[], bloqueiosEdit:null, copeiraTxt:''
-};
-MEALS.forEach(m=>state.aceitacao[m]='100%');
-
-function nowBR(){ return new Date(new Date().toLocaleString('en-US',{timeZone:'America/Sao_Paulo'})); }
-function fmtDate(d){ return d.toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}); }
-function addDays(date, days){ const d = new Date(date); d.setDate(d.getDate()+days); return d; }
-
-/* ---------------- THEME ---------------- */
-const html = document.documentElement;
-function setTheme(t){
-  html.setAttribute('data-theme', t);
-  document.getElementById('themeToggle').textContent = t==='dark' ? '🌙' : '☀️';
-  window.storage && window.storage.set('theme', t, false).catch(()=>{});
-}
-document.getElementById('themeToggle').onclick = ()=>{ setTheme(html.getAttribute('data-theme')==='dark' ? 'comfort':'dark'); };
-(async()=>{ try{ const r = await window.storage.get('theme', false); if(r) setTheme(r.value); }catch(e){} })();
-
-/* ---------------- GENERIC HELPERS ---------------- */
-function bindSingle(containerId, onChange){
-  const c = document.getElementById(containerId);
-  c.querySelectorAll('.opt').forEach(o=>{
-    o.onclick = ()=>{
-      c.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
-      o.classList.add('on');
-      onChange(o.dataset.v);
-    };
-  });
-}
-function bindMulti(containerId, arr, onChange, exclusiveVal){
-  const c = document.getElementById(containerId);
-  c.querySelectorAll('.opt').forEach(o=>{
-    o.onclick = ()=>{
-      const v = o.dataset.v;
-      const i = arr.indexOf(v);
-      if(exclusiveVal && v===exclusiveVal){ arr.length=0; if(i===-1) arr.push(v); }
-      else{
-        if(exclusiveVal){ const ni = arr.indexOf(exclusiveVal); if(ni>-1) arr.splice(ni,1); }
-        if(i>-1) arr.splice(i,1); else arr.push(v);
-      }
-      c.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on', arr.includes(x.dataset.v)));
-      onChange();
-    };
-  });
-}
-
-bindSingle('fSexo', v=>{ state.sexo=v; recalc(); });
-bindSingle('egConsciencia', v=>{ state.egConsciencia=v; recalc(); });
-bindSingle('egColaboracao', v=>{ state.egColaboracao=v; recalc(); });
-bindSingle('egAcompanhante', v=>{ state.egAcompanhante=v; recalc(); });
-bindSingle('dietaEspecial', v=>{ state.dietaEspecial=v; recalc(); });
-bindSingle('fCaneta', v=>{
-  state.caneta=v;
-  document.getElementById('canetaNomeWrap').classList.toggle('hidden', v!=='sim');
-  recalc();
-});
-bindMulti('fSintomas', state.sintomas, recalc, 'Sem sintomas');
-bindSingle('fEvacuacao', v=>{ state.evacuacao=v; recalc(); });
-bindSingle('fEvacMed', v=>{
-  state.evacMed=v;
-  document.getElementById('evacMedicamentoWrap').classList.toggle('hidden', v!=='sim');
-  recalc();
-});
-bindSingle('fJejum', v=>{
-  state.jejum=v;
-  document.getElementById('jejumDetalhe').classList.toggle('hidden', v!=='sim');
-  recalc();
-});
-
-document.getElementById('fComorbidades').querySelectorAll('.check').forEach(el=>{
-  el.onclick = ()=>{
-    el.classList.toggle('on');
-    const v = el.dataset.v;
-    const i = state.comorbidades.indexOf(v);
-    if(el.classList.contains('on')){ if(i===-1) state.comorbidades.push(v); }
-    else{ if(i>-1) state.comorbidades.splice(i,1); }
-    recalc();
-  };
-});
-
-const textBindings = [
-  ['fLeito','leito'],['fAndar','andar'],['fPeso','peso'],['fAltura','altura'],['fPPR','ppr'],
-  ['fTriResultado','triResultado'],['fDietaTasy','dietaTasy'],['fDietaPos','dietaPos'],
-  ['fPreferencias','preferenciasTxt'],['fBloqueios','bloqueiosTxt'],
-  ['fAlergias','alergias'],['fIntolerancias','intolerancias'],['fSensibilidades','sensibilidades'],
-  ['fHidratacao','hidratacao'],['fJejumHorario','jejumHorario'],['fJejumMotivo','jejumMotivo'],
-  ['fOutrasComorb','outrasComorb'],['fEspecClinica','especClinica'],['fObsGastro','obsGastro'],
-  ['fEvacMedicamento','evacMedicamento'],['fEvacUltimaData','evacUltimaData'],['fNascimento','nascimento'],
-  ['fCanetaNome','canetaNome']
-];
-textBindings.forEach(([id,key])=>{
-  document.getElementById(id).addEventListener('input', e=>{ state[key]=e.target.value; recalc(); });
-});
-
-/* Chips de refeição para Preferências (multi-seleção) */
-const prefRefeicoesEl = document.getElementById('prefRefeicoes');
-let prefRefeicoesSel = [];
-MEALS.forEach(m=>{
-  const opt = document.createElement('div');
-  opt.className='opt';
-  opt.dataset.v = m;
-  opt.textContent = m;
-  prefRefeicoesEl.appendChild(opt);
-});
-prefRefeicoesEl.querySelectorAll('.opt').forEach(o=>{
-  o.onclick = ()=>{
-    o.classList.toggle('on');
-    const v = o.dataset.v;
-    const i = prefRefeicoesSel.indexOf(v);
-    if(o.classList.contains('on')){ if(i===-1) prefRefeicoesSel.push(v); }
-    else{ if(i>-1) prefRefeicoesSel.splice(i,1); }
-  };
-});
-
-/* Aceitação por refeição */
-const mealRowsEl = document.getElementById('mealRows');
-MEALS.forEach(m=>{
-  const row = document.createElement('div');
-  row.className='meal-row';
-  row.innerHTML = `<div class="mlabel">${m}</div><div class="meal-pct" data-meal="${m}">
-    ${['0%','25%','50%','75%','100%'].map(p=>`<div class="p" data-v="${p}">${p}</div>`).join('')}
-  </div>`;
-  mealRowsEl.appendChild(row);
-});
-mealRowsEl.querySelectorAll('.meal-pct').forEach(mp=>{
-  const def = mp.querySelector('.p[data-v="100%"]');
-  if(def) def.classList.add('on');
-});
-mealRowsEl.querySelectorAll('.meal-pct').forEach(mp=>{
-  mp.querySelectorAll('.p').forEach(p=>{
-    p.onclick = ()=>{
-      mp.querySelectorAll('.p').forEach(x=>x.classList.remove('on'));
-      p.classList.add('on');
-      state.aceitacao[mp.dataset.meal] = p.dataset.v;
-      recalc();
-    };
-  });
-});
-
-/* ---------------- IDADE / PROTOCOLO ---------------- */
-function calcIdade(nascStr, refDate){
-  if(!nascStr) return null;
-  const n = new Date(nascStr+'T00:00:00');
-  let anos = refDate.getFullYear()-n.getFullYear();
-  let meses = refDate.getMonth()-n.getMonth();
-  if(refDate.getDate()<n.getDate()) meses--;
-  if(meses<0){ anos--; meses+=12; }
-  return {anos, meses};
-}
-function faixaEtaria(idade){
-  if(!idade) return null;
-  if(idade.anos<10) return 'crianca';
-  if(idade.anos<18) return 'adolescente';
-  if(idade.anos<60) return 'adulto';
-  return 'idoso';
-}
-function protocoloDe(faixa){
-  if(faixa==='crianca'||faixa==='adolescente') return {sigla:'STK', nome:'STRONG Kids'};
-  if(faixa==='idoso') return {sigla:'MNA', nome:'MNA'};
-  return {sigla:'NRS-2002', nome:'NRS-2002'};
-}
-function faixaLabel(faixa){
-  return {crianca:'CRIANÇA', adolescente:'ADOLESCENTE', adulto:'ADULTO', idoso:'IDOSO'}[faixa] || '—';
-}
-
-/* ---------------- CALC LOGIC ---------------- */
-function calcIMC(){
-  const p = parseFloat(state.peso), a = parseFloat(state.altura);
-  if(!p || !a) return null;
-  const am = a/100;
-  return p/(am*am);
-}
-function classifOMSAdulto(imc){
-  if(imc<18.5) return 'Baixo peso';
-  if(imc<25) return 'Eutrófico';
-  if(imc<30) return 'Sobrepeso';
-  if(imc<35) return 'Obesidade grau I';
-  if(imc<40) return 'Obesidade grau II';
-  return 'Obesidade grau III';
-}
-function classifIdoso(imc){
-  // Classificação de Lipschitz, referência geriátrica amplamente usada no Brasil
-  if(imc<22) return 'Baixo peso';
-  if(imc<=27) return 'Eutrófico';
-  return 'Excesso de peso';
-}
-function estimateZ(imc, idade, sexo){
-  // Aproximação simplificada — não substitui as tabelas LMS oficiais da OMS
-  if(!imc || !idade) return null;
-  const mediaAdulta = 17 + Math.min(idade.anos,10)*0.4; // curva de referência aproximada
-  const dp = 1.6;
-  return (imc - mediaAdulta)/dp;
-}
-function classifZ(z){
-  if(z===null) return '—';
-  if(z<-3) return 'Magreza acentuada';
-  if(z<-2) return 'Magreza';
-  if(z<=1) return 'Eutrófico';
-  if(z<=2) return 'Risco de sobrepeso';
-  if(z<=3) return 'Sobrepeso';
-  return 'Obesidade';
-}
-function zToPercentil(z){
-  if(z===null) return '—';
-  // aproximação da função de distribuição normal
-  const t = 1/(1+0.2316419*Math.abs(z));
-  const d = 0.3989423*Math.exp(-z*z/2);
-  let p = d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
-  p = z>0 ? 1-p : p;
-  return Math.round(p*100)+'º';
-}
-
-function calcNivel(){
-  const n = state.comorbidades.length;
-  const bariatrica = state.comorbidades.includes('Bariátrica');
-  const grandePorte = state.comorbidades.includes('Cirurgia de grande porte');
-  if(n>=2 || bariatrica || grandePorte) return 'Terciário';
-  if(n===1 || state.dietaEspecial==='sim') return 'Secundário';
-  return 'Primário';
-}
-function diasPorNivel(nivel){ return nivel==='Terciário' ? 3 : nivel==='Secundário' ? 4 : 7; }
-function nivelClass(n){ return n==='Terciário'?'terciario':n==='Secundário'?'secundario':'primario'; }
-
-function drawChart(imc, idade, z){
-  const svg = document.getElementById('whoChart');
-  const W=320,H=190,padL=30,padR=10,padT=10,padB=24;
-  const maxIdade = 19;
-  const x = a => padL + (a/maxIdade)*(W-padL-padR);
-  const y = v => H-padB - ((v-10)/25)*(H-padT-padB);
-  const curves = { p3:[], p50:[], p97:[] };
-  for(let a=0;a<=maxIdade;a+=1){
-    const base = 15 + a*0.35;
-    curves.p3.push([a, base-3.5]);
-    curves.p50.push([a, base]);
-    curves.p97.push([a, base+5]);
-  }
-  const path = arr => 'M'+arr.map(([a,v])=>`${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(' L');
-  let s = `<line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="var(--border)" stroke-width="1"/>`;
-  s += `<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="var(--border)" stroke-width="1"/>`;
-  s += `<path d="${path(curves.p97)}" fill="none" stroke="var(--danger)" stroke-width="1.2" opacity="0.55"/>`;
-  s += `<path d="${path(curves.p50)}" fill="none" stroke="var(--ok)" stroke-width="1.4" opacity="0.7"/>`;
-  s += `<path d="${path(curves.p3)}" fill="none" stroke="var(--warn)" stroke-width="1.2" opacity="0.55"/>`;
-  s += `<text x="${W-padR}" y="${y(curves.p97[maxIdade][1])-2}" font-size="8" fill="var(--danger)" text-anchor="end">P97</text>`;
-  s += `<text x="${W-padR}" y="${y(curves.p50[maxIdade][1])-2}" font-size="8" fill="var(--ok)" text-anchor="end">P50</text>`;
-  s += `<text x="${W-padR}" y="${y(curves.p3[maxIdade][1])-2}" font-size="8" fill="var(--warn)" text-anchor="end">P3</text>`;
-  if(imc && idade){
-    const ageDec = idade.anos + idade.meses/12;
-    const px = x(Math.min(ageDec,maxIdade)), py = y(Math.min(Math.max(imc,10),35));
-    s += `<circle cx="${px}" cy="${py}" r="4.5" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>`;
-  }
-  s += `<text x="${padL}" y="${H-6}" font-size="8" fill="var(--text-faint)">0 anos</text>`;
-  s += `<text x="${W-padR}" y="${H-6}" font-size="8" fill="var(--text-faint)" text-anchor="end">19 anos</text>`;
-  svg.innerHTML = s;
-}
-
-function recalc(){
-  const dataVisita = state.data ? new Date(state.data) : nowBR();
-  const idade = calcIdade(state.nascimento, dataVisita);
-  const faixa = faixaEtaria(idade);
-  const protocolo = protocoloDe(faixa);
-  const imc = calcIMC();
-
-  let oms='—', z=null, percentil=null;
-  document.getElementById('itemZscore').classList.add('hidden');
-  document.getElementById('itemPercentil').classList.add('hidden');
-  document.getElementById('chartArea').classList.add('hidden');
-
-  if(imc!==null){
-    if(faixa==='idoso') oms = classifIdoso(imc);
-    else if(faixa==='crianca' || faixa==='adolescente'){
-      z = estimateZ(imc, idade, state.sexo);
-      oms = classifZ(z);
-      percentil = zToPercentil(z);
-      document.getElementById('itemZscore').classList.remove('hidden');
-      document.getElementById('itemPercentil').classList.remove('hidden');
-      document.getElementById('calcZ').textContent = z!==null ? z.toFixed(2) : '—';
-      document.getElementById('calcPercentil').textContent = percentil;
-      document.getElementById('chartArea').classList.remove('hidden');
-      drawChart(imc, idade, z);
-    } else {
-      oms = classifOMSAdulto(imc);
+    {
+      "nome": "Chocolate (ao leite / meio amargo)",
+      "categoria_alimentar": "Outros / Doces",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": 355,
+      "justificativa": "TACO: Chocolate ao leite (item 495) = 355 mg/100g; meio amargo (item 498) = 432 mg/100g. Confirma restrição citada no documento de origem e no Manual SBN (p.46, exemplo de alto teor de potássio).",
+      "observacoes": "Nenhuma divergência relevante — dados numéricos e clínicos convergem.",
+      "tecnica_preparo": "Não aplicável.",
+      "substituicoes": ["Gelatina de frutas permitidas (com moderação de porção)"],
+      "referencias": ["TACO 4ª ed., itens 495 e 498, p.56-57", "Manual SBN DRC 4-5, p.46"]
+    },
+    {
+      "nome": "Café (solúvel/pó, infusão)",
+      "categoria_alimentar": "Bebida",
+      "classificacao": "🟡 Consumir com moderação",
+      "potassio_mg_100ml": 156,
+      "justificativa": "TACO: Café, infusão 10% (item 471) = 156 mg K/100ml (bebida pronta para consumo); Café pó torrado (item 511) = 1609 mg/100g (pó concentrado, não diluído). O documento de origem lista 'Café solúvel' como contraindicado.",
+      "observacoes": "DIVERGÊNCIA A REGISTRAR: o valor do PÓ (1609 mg/100g) é extremamente alto, mas não é a forma consumida diretamente — a bebida pronta (infusão 10%) tem valor moderado (156 mg/100ml). A classificação depende criticamente da concentração do preparo e do volume consumido; recomenda-se orientar o paciente quanto à concentração (evitar café muito forte/concentrado ou em grandes volumes) em vez de proibição absoluta, sujeito a avaliação clínica individual.",
+      "tecnica_preparo": "Preparar com diluição padrão (não concentrado); evitar múltiplas xícaras.",
+      "substituicoes": ["Chá mate ou chá preto em infusão (valores baixos: 5-13 mg/100ml — TACO itens 476-477)"],
+      "referencias": ["TACO 4ª ed., itens 471 e 511, p.56-57 e 58-59", "Documento de origem do projeto"]
+    },
+    {
+      "nome": "Sal Dietético / Sal Light",
+      "categoria_alimentar": "Condimento",
+      "classificacao": "🔴 Evitar",
+      "potassio_mg_100g": "valor não extraído numericamente nesta consulta (coluna truncada na extração de texto)",
+      "justificativa": "TACO (item 516, 'Sal, dietético'): entrada presente na tabela, composta predominantemente por cloreto de potássio (KCl) como substituto do cloreto de sódio; teor de cinzas de 99,4% indica concentração mineral quase total. O valor numérico exato de potássio não pôde ser confirmado com precisão na extração de texto realizada nesta sessão (célula da tabela com formatação irregular no PDF).",
+      "observacoes": "IMPORTANTE — RECOMENDAÇÃO CLÍNICA MANTIDA MESMO SEM VALOR EXATO: sal light/dietético é formulado especificamente à base de cloreto de potássio e deve ser INTEGRALMENTE EVITADO em dietas hipopotássicas, independentemente do valor numérico exato, conforme confirmado tanto pelo documento de origem do projeto quanto pelo Manual SBN (p.44: 'Cuidado com o sal light: é rico em potássio e pode aumentar o nível de potássio no sangue'). Recomenda-se buscar o valor exato na TBCA para completude do banco de dados, mas a classificação clínica não depende dessa confirmação numérica.",
+      "tecnica_preparo": "Não aplicável — evitar uso.",
+      "substituicoes": ["Temperos naturais (alho, cebola, ervas frescas ou secas, limão)"],
+      "referencias": ["TACO 4ª ed., item 516, p.56-57", "Manual SBN DRC 4-5, p.44", "Documento de origem do projeto"]
     }
-  }
+  ],
 
-  const nivel = calcNivel();
-  const dias = diasPorNivel(nivel);
-  const proxima = addDays(dataVisita, dias);
+  "resumo_divergencias_para_revisao_clinica": [
+    "Banana Maçã: listada como permitida no documento de origem, mas com 264 mg K/100g (TACO) — valor alto para a categoria 'preferir'.",
+    "Morango: manual clínico cita como baixo potássio; TACO mostra 184 mg/100g (moderado).",
+    "Laranja Pera/Baiana: documento de origem classifica como contraindicada; valores TACO (158-174 mg/100g) são moderados, inferiores a diversos itens 🟡.",
+    "Mexerica/Tangerina: documento de origem classifica como contraindicada; valores TACO (125-159 mg/100g) são baixos a moderados.",
+    "Mamão: documento de origem não diferencia variedades; TACO mostra diferença relevante entre Formosa (222 mg) e Papaia (126 mg).",
+    "Figo: documento de origem restringe genericamente; TACO mostra valor moderado para o fruto fresco (174 mg/100g) — restrição provavelmente mais aplicável à forma seca/desidratada, não quantificada nesta consulta.",
+    "Açaí e Água de coco: valores TACO por 100g/100ml não são extremos, mas a restrição clínica se sustenta por fatores de porção/concentração habitual de consumo e, no caso do açaí, também pelo teor lipídico/calórico.",
+    "Soja: TACO mostra grande variação entre farinha/extrato em pó (muito ricos em K) e tofu (182 mg/100g, moderado) — recomenda-se não generalizar a restrição para todos os derivados de soja.",
+    "Mandioquinha (batata baroa): mesmo após cocção com descarte de água, valor residual estimado (258 mg/100g) permanece acima do corte usual de 250 mg — reavaliar se deve permanecer na categoria 🟠 ou passar para 🔴.",
+    "Couve-manteiga: a única redução documentada na TACO é para o método 'refogado' (queda de apenas ~22%), não para fervura em água abundante com descarte — divergência metodológica a esclarecer antes de orientar a técnica de preparo.",
+    "Alface, Repolho e Pimentão: grande variação entre cultivares/variedades (ex.: alface americana 136 mg vs. alface lisa 349 mg) não diferenciada no documento de origem."
+  ],
 
-  state._imc=imc; state._oms=oms; state._z=z; state._percentil=percentil;
-  state._nivel=nivel; state._proxima=proxima; state._dataVisita=dataVisita;
-  state._idade=idade; state._faixa=faixa; state._protocolo=protocolo;
-
-  document.getElementById('calcIMC').textContent = imc? imc.toFixed(1) : '—';
-  document.getElementById('calcOMS').textContent = oms;
-  document.getElementById('calcNivel').textContent = nivel;
-  document.getElementById('calcProxima').textContent = fmtDate(proxima);
-  document.getElementById('hdrLeito').textContent = state.leito || '—';
-  document.getElementById('hdrData').textContent = fmtDate(dataVisita);
-  document.getElementById('hdrNivel').innerHTML = `<span class="badge ${nivelClass(nivel)}"><span class="dot"></span>${nivel}</span>`;
-
-  const idadeTxt = idade ? `${idade.anos} ano(s) e ${idade.meses} mes(es)` : '—';
-  document.getElementById('idadeInfo').innerHTML = idade
-    ? `Idade: <b>${idadeTxt}</b> · Faixa: <b>${faixaLabel(faixa)}</b> · Protocolo automático: <b>${protocolo.nome}</b>`
-    : 'Informe a data de nascimento para o app definir automaticamente idade, faixa etária e o protocolo de triagem (STRONG Kids, NRS-2002 ou MNA).';
-  document.getElementById('protocoloTag').textContent = protocolo.sigla;
-  document.getElementById('protocoloTag2').textContent = protocolo.sigla;
-  document.getElementById('triResultLabel').textContent = `Resultado (${protocolo.nome})`;
-
-  renderGestao();
-  renderEvolucao();
-  scheduleAutosave();
+  "itens_nao_localizados_na_taco_requerem_validacao_tbca": [
+    "Escarola",
+    "Lima da Pérsia",
+    "Nectarina",
+    "Damasco",
+    "Ervilha",
+    "Avelã",
+    "Quiabo cozido (apenas cru disponível)",
+    "Vagem cozida (apenas crua disponível)",
+    "Acelga cozida (apenas crua disponível)",
+    "Sal dietético/light (entrada presente, valor numérico de potássio não extraído com confiabilidade nesta sessão)"
+  ]
 }
-
-let autosaveTimer = null;
-function scheduleAutosave(){
-  if(!state.leito) return;
-  clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(async ()=>{
-    try{
-      const record = {...state, savedAt: nowBR().toISOString(), dataVisita: state._dataVisita.toISOString(), proxima: state._proxima.toISOString(), nivel: state._nivel, oms: state._oms, imc: state._imc, autosaved:true};
-      await window.storage.set('visita:'+state.leito, JSON.stringify(record), false);
-    }catch(e){ /* autosave falhou silenciosamente, o botão Salvar visita continua disponível */ }
-  }, 1200);
-}
-
-/* ---------------- GESTÃO DA NUTRIÇÃO ---------------- */
-function renderGestao(){
-  const altM = state.altura ? (parseFloat(state.altura)/100).toFixed(2).replace('.',',') : '—';
-  const proxima = state._proxima ? fmtDate(state._proxima) : '—';
-  const protoLabel = `${state._protocolo.sigla} (${faixaLabel(state._faixa)})`;
-  let info = `Informações nutricionais: P: ${state.peso||'—'} Kg // A: ${altM} m // Próxima visita: ${proxima} // ${protoLabel}: ${proxima} // Nível de assistência: ${state._nivel||'—'}.`;
-  const obsItems = (state.especClinica||'').split(',').map(s=>s.trim()).filter(Boolean);
-  if(obsItems.length) info += '\n\n' + obsItems.map(o=>`>>${o.toUpperCase()}<<`).join('\n');
-  document.getElementById('genInfoNutri').textContent = info;
-
-  if(state.bloqueiosEdit===null){
-    let lines = [];
-    const alergiasList = state.alergias.split(',').map(s=>s.trim()).filter(Boolean);
-    const intolList = state.intolerancias.split(',').map(s=>s.trim()).filter(Boolean);
-    const sensList = state.sensibilidades.split(',').map(s=>s.trim()).filter(Boolean);
-    if(alergiasList.length) lines.push(`>>>ALERGIA A: ${alergiasList.join(', ').toUpperCase()}<<<`);
-    if(intolList.length) lines.push(`>>>INTOLERÂNCIA A: ${intolList.join(', ').toUpperCase()}<<<`);
-    if(sensList.length) lines.push(`>>>SENSIBILIDADE A: ${sensList.join(', ').toUpperCase()}<<<`);
-    state.bloqueiosTxt.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`NÃO GOSTA DE ${a.toUpperCase()}`));
-    document.getElementById('genBloqueios').value = lines.join('\n');
-  }
-  renderPrefList();
-}
-function renderPrefList(){
-  const list = document.getElementById('prefList');
-  list.innerHTML='';
-  state.prefItems.forEach((it,idx)=>{
-    const row = document.createElement('div');
-    row.className='listrow';
-    row.innerHTML = `<span>${it.refeicao} — ${it.texto}</span><span class="rm" data-i="${idx}">✕</span>`;
-    list.appendChild(row);
-  });
-  list.querySelectorAll('.rm').forEach(el=>{
-    el.onclick = ()=>{ state.prefItems.splice(parseInt(el.dataset.i),1); renderPrefList(); genPrefText(); };
-  });
-  genPrefText();
-}
-function genPrefText(){
-  const byMeal = {};
-  state.prefItems.forEach(it=>{ byMeal[it.refeicao] = byMeal[it.refeicao] || []; byMeal[it.refeicao].push(it.texto); });
-  let out = Object.keys(byMeal).map(m=>`${m.toUpperCase()}:\n` + byMeal[m].join('\n')).join('\n\n');
-  document.getElementById('genPreferencias').textContent = out || '—';
-}
-let prefTipoVal = 'pref';
-document.getElementById('prefTipo').querySelectorAll('.opt').forEach(o=>{
-  o.onclick = ()=>{
-    document.getElementById('prefTipo').querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
-    o.classList.add('on'); prefTipoVal = o.dataset.v;
-  };
-});
-document.getElementById('prefAddBtn').onclick = ()=>{
-  const alimento = document.getElementById('prefAlimento').value.trim();
-  if(!alimento) return;
-  const refeicao = document.getElementById('prefRefeicao').value;
-  const texto = prefTipoVal==='add' ? `ADICIONAR ${alimento.toUpperCase()}` : `PREF. ${alimento.toUpperCase()}`;
-  state.prefItems.push({refeicao, texto});
-  document.getElementById('prefAlimento').value='';
-  renderPrefList();
-};
-document.getElementById('genBloqueios').addEventListener('input', e=>{ state.bloqueiosEdit = e.target.value; });
-document.querySelectorAll('.tagbtn').forEach(el=>{
-  el.onclick = ()=>{
-    const ta = document.getElementById('genCopeira');
-    ta.value = ta.value ? ta.value + '\n' + el.dataset.txt : el.dataset.txt;
-    state.copeiraTxt = ta.value;
-  };
-});
-document.getElementById('genCopeira').addEventListener('input', e=>{ state.copeiraTxt = e.target.value; });
-
-/* ---------------- EVOLUÇÃO 100% DINÂMICA ---------------- */
-function listOrNegative(txt, negFrase, posPrefix){
-  const items = (txt||'').split(',').map(s=>s.trim()).filter(Boolean);
-  if(items.length===0) return negFrase;
-  return posPrefix + items.join(', ') + '.';
-}
-function fraseEstadoGeral(){
-  const parts = [];
-  if(state.egConsciencia) parts.push(state.egConsciencia==='Consciente' ? 'consciente' : state.egConsciencia.toLowerCase());
-  if(state.egColaboracao) parts.push(state.egColaboracao.toLowerCase());
-  let base = parts.length ? parts.join(' e ') : 'sem avaliação de estado geral registrada';
-  let acomp = state.egAcompanhante === 'Com acompanhante' ? 'com acompanhante' : state.egAcompanhante === 'Sem acompanhante' ? 'sem acompanhante' : '';
-  let frase = `Em visita de admissão, paciente encontrado ${base}${acomp ? ', '+acomp : ''}.`;
-  return frase;
-}
-function fraseJejum(){
-  if(state.jejum==='sim'){
-    let extra = [];
-    if(state.jejumHorario) extra.push(`desde ${state.jejumHorario}`);
-    if(state.jejumMotivo) extra.push(`motivo: ${state.jejumMotivo}`);
-    return 'Em jejum' + (extra.length ? ' ('+extra.join(', ')+')' : '') + '.';
-  }
-  return 'Não está em jejum.';
-}
-function fraseSintomas(){
-  if(state.sintomas.length===0 || state.sintomas.includes('Sem sintomas')) return 'Nega sintomas gastrointestinais.';
-  let f = `Apresenta ${state.sintomas.join(', ').toLowerCase()}.`;
-  if(state.obsGastro) f += ' ' + state.obsGastro.trim().replace(/([^.])$/,'$1.');
-  return f;
-}
-function fraseEvacuacao(){
-  if(!state.evacuacao) return '';
-  let f = `Evacuação ${state.evacuacao.toLowerCase()}`;
-  if(state.evacMed==='sim') f += `, com uso de medicação${state.evacMedicamento ? ' ('+state.evacMedicamento+')' : ''}`;
-  if(state.evacUltimaData){
-    const d = new Date(state.evacUltimaData+'T00:00:00');
-    f += `, última evacuação em ${fmtDate(d)}`;
-  }
-  return f + '.';
-}
-function fraseHidratacao(){
-  return state.hidratacao ? `Hidratação via oral de ${state.hidratacao} L/dia.` : 'Hidratação não quantificada.';
-}
-function fraseAceitacao(){
-  const filled = MEALS.filter(m=>state.aceitacao[m]);
-  if(filled.length===0) return 'Aceitação alimentar não registrada por refeição.';
-  return 'Aceitação alimentar: ' + filled.map(m=>`${m.toLowerCase()} ${state.aceitacao[m]}`).join(', ') + '.';
-}
-function fraseDieta(){
-  const padrao = state.dietaPos || state.dietaTasy;
-  return padrao ? `Em uso de ${padrao.toLowerCase()}.` : 'Padrão alimentar não especificado.';
-}
-function fraseCaneta(){
-  if(state.caneta==='sim') return `Faz uso de caneta emagrecedora${state.canetaNome ? ' ('+state.canetaNome+')' : ''}.`;
-  return 'Nega uso de caneta emagrecedora.';
-}
-function fraseComorbidades(){
-  const list = [...state.comorbidades];
-  if(state.outrasComorb) list.push(state.outrasComorb);
-  return list.length ? `Nível de assistência: ${state._nivel} (devido à presença de ${list.join(', ')}).` : `Nível de assistência: ${state._nivel} (sem comorbidades relevantes).`;
-}
-function fraseEstadoNutricional(){
-  if(state._faixa==='crianca'||state._faixa==='adolescente'){
-    return `Estado nutricional (curva OMS, escore Z ${state._z!==null?state._z.toFixed(2):'—'}): ${state._oms}.`;
-  }
-  return `Estado nutricional: ${state._oms}.`;
-}
-function frasePrefsBloqueiosGenerica(){
-  const temAlgo = (state.preferenciasTxt||'').trim() || (state.prefItems&&state.prefItems.length) || (state.bloqueiosTxt||'').trim();
-  return temAlgo ? 'Registradas preferências e bloqueios alimentares na gestão nutricional.' : '';
-}
-
-/* ---------- MODELO ADULTO / IDOSO ---------- */
-function renderEvolucaoAdulto(){
-  const proxima = state._proxima ? fmtDate(state._proxima) : '—';
-  const linhas = [
-    fraseEstadoGeral(),
-    '',
-    fraseComorbidades() + ` Próxima visita: ${proxima}.`,
-    fraseEstadoNutricional(),
-    fraseDieta(),
-    fraseCaneta(),
-    fraseAceitacao(),
-    listOrNegative(state.alergias, 'Nega alergias alimentares.', 'Refere alergia a '),
-    listOrNegative(state.intolerancias, 'Nega intolerâncias alimentares.', 'Refere intolerância a '),
-    listOrNegative(state.sensibilidades, 'Nega sensibilidades alimentares.', 'Refere sensibilidade a ')
-  ];
-  const prefsLinha = frasePrefsBloqueiosGenerica();
-  if(prefsLinha) linhas.push(prefsLinha);
-  linhas.push(
-    fraseSintomas(),
-    fraseEvacuacao(),
-    fraseHidratacao(),
-    fraseJejum(),
-    '',
-    'CONDUTA NUTRICIONAL: ' + (state.especClinica ? state.especClinica.toUpperCase()+'.' : 'Mantida conduta nutricional atual, com reavaliação programada.')
-  );
-  document.getElementById('genEvolucao').textContent = linhas.join('\n');
-}
-
-/* ---------- MODELO PEDIÁTRICO (0 a 18 anos incompletos) ---------- */
-function fraseAcompanhantePed(){
-  if(state.egAcompanhante==='Com acompanhante') return 'encontro paciente acompanhado por seu responsável.';
-  if(state.egAcompanhante==='Sem acompanhante') return 'encontro paciente desacompanhado.';
-  return 'encontro paciente para avaliação nutricional.';
-}
-function refereNega(txt, label){
-  const items = (txt||'').split(',').map(s=>s.trim()).filter(Boolean);
-  return items.length ? `Refere ${label}: ${items.join(', ')}.` : `Nega ${label}.`;
-}
-function refereNegaComorbPed(){
-  const list=[...state.comorbidades]; if(state.outrasComorb) list.push(state.outrasComorb);
-  return list.length ? `Refere comorbidades: ${list.join(', ')}.` : 'Nega comorbidades.';
-}
-function habitoIntestinalPed(){
-  let f = state.evacuacao ? `Hábito intestinal ${state.evacuacao.toLowerCase()}` : 'Hábito intestinal não relatado';
-  if(state.evacUltimaData){
-    const d = new Date(state.evacUltimaData+'T00:00:00');
-    f += `, sendo a última evacuação em ${fmtDate(d)}`;
-  }
-  return f + '.';
-}
-function hidratacaoMl(){
-  if(!state.hidratacao) return '___';
-  return String(Math.round(parseFloat(state.hidratacao)*1000));
-}
-function aceitacaoLinhaPed(){
-  return MEALS.map(m=> `${m} ${state.aceitacao[m]||'—'}`).join('; ') + '.';
-}
-function renderEvolucaoPediatrica(){
-  const proxima = state._proxima ? fmtDate(state._proxima) : '__/__/____';
-  const condutaDieta = state.especClinica || state.dietaPos || state.dietaTasy || '________________';
-  const linhas = [
-    `Andar: ${state.andar||'___'}  Leito: ${state.leito||'___'}`,
-    '',
-    `Em visita de admissão, ${fraseAcompanhantePed()} Confirmados peso e altura. ${refereNega(state.alergias,'alergias alimentares')} ${refereNega(state.intolerancias,'intolerâncias alimentares')} ${refereNega(state.sensibilidades,'sensibilidades alimentares')} ${habitoIntestinalPed()} Ingestão hídrica referida de aproximadamente ${hidratacaoMl()} mL nas últimas 24 horas. Registradas preferências e bloqueios alimentares na gestão nutricional. Segundo o gráfico de IMC para idade da Organização Mundial da Saúde (OMS), paciente apresenta ${(state._oms||'classificação nutricional a definir').toLowerCase()}. ${refereNegaComorbPed()} Aceitação alimentar: ${aceitacaoLinhaPed()}`,
-    '',
-    `Triagem Nutricional: Strong Kids: ${state.triResultado||'___'}.`,
-    `Nível de assistência: ${state._nivel||'—'}. Próxima visita: ${proxima}.`,
-    '',
-    'Conduta nutricional:',
-    `• Mantenho/Altero dieta para ${condutaDieta};`,
-    '• Ajusto o planejamento alimentar conforme preferências e bloqueios alimentares;',
-    '• Acompanho hábito intestinal, nível de hidratação, apetite e aceitação alimentar;',
-    '• Oriento o responsável quanto à hidratação e à alimentação adequada, conforme faixa etária e condição clínica;',
-    '• Acompanho a manutenção do estado nutricional por meio das curvas de crescimento da OMS;',
-    '• Acolho dúvidas, críticas e elogios.'
-  ];
-  document.getElementById('genEvolucao').textContent = linhas.join('\n');
-}
-
-function renderEvolucao(){
-  if(state._faixa==='crianca' || state._faixa==='adolescente') renderEvolucaoPediatrica();
-  else renderEvolucaoAdulto();
-}
-
-/* ---------------- COPY / TOAST ---------------- */
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = '✓ ' + msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 1800);
-}
-function copyText(text){
-  navigator.clipboard.writeText(text).then(()=>showToast('Copiado para a área de transferência')).catch(()=>showToast('Não foi possível copiar'));
-}
-document.querySelectorAll('[data-copy]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const el = document.getElementById(btn.dataset.copy);
-    const text = (el.tagName==='TEXTAREA') ? el.value : el.textContent;
-    copyText(text);
-  });
-});
-document.getElementById('btnCopiarEvolucao').onclick = ()=>{ copyText(document.getElementById('genEvolucao').textContent); };
-
-async function salvarEvolucaoCelular(){
-  const text = document.getElementById('genEvolucao').textContent;
-  const dataTag = state._dataVisita ? fmtDate(state._dataVisita).split('/').join('-') : 'sem-data';
-  const filename = `evolucao_leito_${state.leito||'sem-leito'}_${dataTag}.txt`;
-  if(navigator.canShare){
-    try{
-      const file = new File([text], filename, {type:'text/plain'});
-      if(navigator.canShare({files:[file]})){
-        await navigator.share({files:[file], title:'Evolução Nutricional', text:'Evolução leito '+(state.leito||'')});
-        showToast('Evolução salva/compartilhada');
-        return;
-      }
-    }catch(e){ /* usuário cancelou ou não suportado, cai no fallback */ }
-  }
-  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url), 2000);
-  showToast('Evolução baixada no celular');
-}
-document.getElementById('btnSalvarEvolucaoCelular').onclick = salvarEvolucaoCelular;
-
-/* ---------------- TABS ---------------- */
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.onclick = ()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    ['formulario','gestao','evolucao','painel'].forEach(t=>{
-      document.getElementById('tab-'+t).classList.toggle('hidden', t!==btn.dataset.tab);
-    });
-    if(btn.dataset.tab==='painel') renderPainel();
-  };
-});
-
-/* ---------------- SAVE / PAINEL ---------------- */
-document.getElementById('btnSalvar').onclick = async ()=>{
-  if(!state.leito){ showToast('Informe o leito antes de salvar'); return; }
-  const record = {...state, savedAt: nowBR().toISOString(), dataVisita: state._dataVisita.toISOString(), proxima: state._proxima.toISOString(), nivel: state._nivel, oms: state._oms, imc: state._imc};
-  try{
-    await window.storage.set('visita:'+state.leito, JSON.stringify(record), false);
-    showToast('Visita salva — leito ' + state.leito);
-  }catch(e){ showToast('Erro ao salvar'); }
-};
-async function renderPainel(){
-  const listEl = document.getElementById('painelList');
-  const emptyEl = document.getElementById('painelEmpty');
-  listEl.innerHTML = '<div class="empty">Carregando…</div>';
-  try{
-    const keys = await window.storage.list('visita:', false);
-    if(!keys || !keys.keys || keys.keys.length===0){ listEl.innerHTML=''; emptyEl.classList.remove('hidden'); return; }
-    emptyEl.classList.add('hidden');
-    const items = [];
-    for(const k of keys.keys){
-      try{ const r = await window.storage.get(k, false); if(r) items.push(JSON.parse(r.value)); }catch(e){}
-    }
-    items.sort((a,b)=> a.leito.localeCompare(b.leito));
-    const today = fmtDate(nowBR());
-    listEl.innerHTML = items.map(it=>{
-      const nivel = it.nivel || 'Primário';
-      const visitedToday = fmtDate(new Date(it.dataVisita)) === today;
-      return `<div class="leito-card">
-        <div class="leito-num">${it.leito}</div>
-        <div class="leito-info">
-          <div class="l1"><span class="badge ${nivelClass(nivel)}"><span class="dot"></span>${nivel}</span></div>
-          <div class="l2">Última: ${fmtDate(new Date(it.dataVisita))} · Próxima: ${fmtDate(new Date(it.proxima))}</div>
-        </div>
-        <span class="status-pill ${visitedToday?'hoje':'pend'}">${visitedToday?'Visitado hoje':'Pendente'}</span>
-      </div>`;
-    }).join('');
-  }catch(e){ listEl.innerHTML = '<div class="empty">Não foi possível carregar os leitos.</div>'; }
-}
-
-/* ---------------- INIT ---------------- */
-(function init(){
-  const d = nowBR();
-  state.data = d.toISOString();
-  document.getElementById('fData').value = fmtDate(d);
-  document.getElementById('fJejum').querySelector('[data-v="nao"]').classList.add('on');
-  document.getElementById('fEvacMed').querySelector('[data-v="nao"]').classList.add('on');
-  document.getElementById('fCaneta').querySelector('[data-v="nao"]').classList.add('on');
-  document.getElementById('dietaEspecial').querySelector('[data-v="nao"]').classList.add('on');
-  recalc();
-})();
-</script>
-</body>
-</html>
