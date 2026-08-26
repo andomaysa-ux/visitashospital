@@ -275,12 +275,15 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
   <div class="card">
     <div class="card-title"><span class="ic">📋</span> Triagem<span class="tag" id="protocoloTag2">—</span></div>
     <div class="field"><label id="triResultLabel">Resultado</label><input type="text" id="fTriResultado" placeholder="Ex: Baixo risco / 3 pontos"></div>
+    <div class="calc-item wide" style="margin-top:2px;">
+      <div class="k">Próxima visita (calculada)</div>
+      <div class="v" id="calcProximaTriagem" style="font-size:17px;">—</div>
+    </div>
   </div>
 
   <div class="card">
     <div class="card-title"><span class="ic">🍽️</span> Dieta</div>
-    <div class="field"><label>Dieta prescrita no Tasy</label><input type="text" id="fDietaTasy" placeholder="Ex: Dieta geral"></div>
-    <div class="field"><label>Dieta após avaliação nutricional</label><input type="text" id="fDietaPos" placeholder="Ex: Dieta hipossódica"></div>
+    <div class="field"><label>Tipo de dieta (usado na conduta nutricional)</label><input type="text" id="fDietaPos" placeholder="Ex: dieta hipossódica, dieta hipogordurosa"></div>
     <div class="field">
       <label>Dieta especial?</label>
       <div class="togglebtns" id="dietaEspecial">
@@ -296,6 +299,19 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
       </div>
     </div>
     <div class="field hidden" id="canetaNomeWrap"><label>Qual medicação?</label><input type="text" id="fCanetaNome" placeholder="Ex: semaglutida, tirzepatida, liraglutida"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ic">🩺</span> Condições clínicas específicas<span class="tag">Auto</span></div>
+    <div class="protocol-note">Toque nas condições aplicáveis: o app já sugere bloqueios, preferências, ideias de preparo e, se desejar, sugestão de suplemento — tudo editável na aba Gestão.</div>
+    <div class="chipselect wrap" id="fCondicoes"></div>
+    <div class="field" style="margin-top:12px;">
+      <label>Sugerir suplemento oral nas sugestões? (opcional)</label>
+      <div class="togglebtns" id="fSugerirSuplemento">
+        <div class="opt" data-v="nao">Não</div>
+        <div class="opt" data-v="sim">Sim</div>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -461,6 +477,11 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
     <button class="copybtn" data-copy="genBloqueios" style="margin-top:10px;">📋 Copiar</button>
   </div>
 
+  <div class="card" id="cardSugestoesCondicoes">
+    <div class="card-title"><span class="ic">💡</span> Sugestões por condição clínica</div>
+    <div id="sugestoesCondicoesBody" class="protocol-note" style="margin-bottom:0;">Marque uma condição clínica no Formulário para ver aqui ideias de preparo (vitaminas, mingaus, mousses, tapiocas...) e, se ativado, sugestões de suplemento oral.</div>
+  </div>
+
   <div class="card">
     <div class="card-title"><span class="ic">👩🏻‍🍳</span> Observações para Copeira</div>
     <div class="tagrow">
@@ -513,6 +534,76 @@ html[data-theme="dark"] .meal-pct .p.on{color:#0A0D14;}
 </nav>
 
 <script>
+/* ---------------- CONDIÇÕES CLÍNICAS — BASE DE CONHECIMENTO ---------------- */
+/* Sugestões de apoio à decisão, baseadas em princípios gerais de dietoterapia
+   (BRASPEN/ESPEN e literatura clínica usual). Não substituem o julgamento
+   clínico do nutricionista responsável nem protocolos institucionais. */
+const CONDICOES = {
+  vertigem: {
+    label: 'Vertigem / Labirintite',
+    bloqueios: ['SEM CAFÉ','SEM CHÁ PRETO/MATE','SEM CHOCOLATE','SEM SOBREMESA DOCE CONCENTRADA','RESTRIÇÃO DE SÓDIO'],
+    prefs: ['ÁGUA E SUCOS NATURAIS SEM AÇÚCAR'],
+    preparo: 'Fracionar refeições, evitar excesso de sal e cafeína/estimulantes (padrão tipo dieta para Ménière). Preferir preparações leves e bem toleradas.',
+  },
+  diverticulite: {
+    label: 'Diverticulite',
+    bloqueios: ['SEM GRÃOS INTEGRAIS','SEM SEMENTES (LINHAÇA, CHIA, GERGELIM)','SEM CASCAS DE FRUTAS E LEGUMES','SEM FEIJÃO','SEM REPOLHO/BRÓCOLIS EM EXCESSO'],
+    prefs: ['FRUTAS SEM CASCA E SEM SEMENTE (MAÇÃ, PERA)','LEGUMES BEM COZIDOS'],
+    preparo: 'Fase aguda: dieta com baixo resíduo (sopas coadas/purês, arroz branco, frango desfiado, gelatina). Progredir fibras gradualmente conforme melhora clínica, evitando reintrodução precoce de sementes e grãos integrais.',
+  },
+  calculos_renais: {
+    label: 'Cálculos renais (litíase / restrição de oxalato)',
+    bloqueios: ['SEM ESPINAFRE','SEM BETERRABA CRUA','SEM CHOCOLATE','SEM CHÁ PRETO/MATE','SEM EXCESSO DE CASTANHAS E AMENDOIM','RESTRIÇÃO DE SÓDIO'],
+    prefs: ['CÍTRICOS (LIMÃO, LARANJA) PARA APORTE DE CITRATO','ÁGUA EM ABUNDÂNCIA (META > 2,5-3L/DIA)'],
+    preparo: 'Manter cálcio normocalórico via alimentos nas refeições principais (favorece quelação entérica do oxalato); não restringir cálcio totalmente. Reforçar hidratação fracionada ao longo do dia e moderar proteína animal e sódio.',
+    suplemento: 'Se necessário complementar hidratação/volume, considerar bebidas isotônicas ou água aromatizada; suplementação proteica não é rotina nesse quadro.',
+  },
+  hipofermentativa: {
+    label: 'Dieta hipofermentativa (baixo FODMAP)',
+    bloqueios: ['ALMOÇO E JANTAR: SEM FEIJÃO','SEM GRÃO DE BICO','SEM LENTILHA','SEM REPOLHO','SEM BRÓCOLIS','SEM CEBOLA E ALHO','SEM LEITE E DERIVADOS COM LACTOSE','SEM MEL','SEM MAÇÃ E PERA'],
+    prefs: ['ARROZ, BATATA, CENOURA E ABOBRINHA COZIDOS','PROTEÍNAS MAGRAS GRELHADAS'],
+    preparo: 'Ideias de preparo: tapioca com frango desfiado; ovos mexidos apenas no sal e azeite; purê de batata/cenoura; arroz branco com proteína magra grelhada. Evitar fermentáveis (FODMAPs) nas principais refeições.',
+  },
+  cefaleia: {
+    label: 'Cefaleia',
+    bloqueios: ['SEM CAFÉ EM EXCESSO','SEM CHOCOLATE','SEM QUEIJOS AMARELOS/MATURADOS','SEM EMBUTIDOS','SEM ADOÇANTE ARTIFICIAL (ASPARTAME)','SEM BEBIDA ALCOÓLICA'],
+    prefs: ['REFEIÇÕES FRACIONADAS (EVITAR JEJUM PROLONGADO)','HIDRATAÇÃO REFORÇADA'],
+    preparo: 'Retirar temporariamente alimentos historicamente associados a gatilhos de cefaleia (cafeína, tiramina, nitratos, glutamato) e reforçar regularidade das refeições e hidratação.',
+  },
+  endometriose_posop: {
+    label: 'Endometriose — pós-op. de ressecção intestinal',
+    bloqueios: ['ALMOÇO E JANTAR: SEM FEIJÃO','SEM GRÃO DE BICO','SEM REPOLHO/BRÓCOLIS','SEM CEBOLA E ALHO','SEM LACTOSE (TEMPORÁRIO)','SEM FRITURAS'],
+    prefs: ['DIETA FRACIONADA EM PEQUENOS VOLUMES','ARROZ, BATATA, CENOURA COZIDOS'],
+    preparo: 'Dieta de fácil digestão, pobre em FODMAPs e fracionada; progressão gradual de fibras e reintrodução de lactose conforme tolerância e consolidação do hábito intestinal pós-ressecção.',
+  },
+  idoso: {
+    label: 'Paciente idoso',
+    bloqueios: [],
+    prefs: ['OFERTA PROTEICA REFORÇADA EM TODAS AS REFEIÇÕES','FRACIONAMENTO AUMENTADO'],
+    preparo: 'Priorizar textura adequada à deglutição, densidade calórico-proteica nas pequenas porções, e monitorar aceitação de perto (risco de hiporexia). Considerar enriquecimento de preparações (ovo, queijo, azeite) quando aceitação < 75%.',
+    suplemento: 'Se baixa aceitação/risco de sarcopenia: considerar ONS hiperproteico (ex.: Fresubin Protein Powder ou Fresubin 2kcal Drink — Fresenius Kabi; Nutridrink Protein ou Fortimel Compact Protein — Danone). Sugestão a validar conforme avaliação individual.',
+  },
+  diarreia: {
+    label: 'Diarreia',
+    bloqueios: ['SEM PREPARAÇÕES GORDUROSAS','SEM MAMÃO','SEM SUCO DE LARANJA','SEM SUCO DE UVA','SEM LEITE E DERIVADOS (LACTOSE)','SEM CAFÉ','SEM ALIMENTOS INTEGRAIS EM EXCESSO'],
+    prefs: ['ARROZ BRANCO, BATATA E CENOURA COZIDOS','BANANA MADURA','MAÇÃ RALADA/COZIDA SEM CASCA','ÁGUA DE COCO'],
+    preparo: 'Padrão tipo BRAT adaptado (banana, arroz, maçã, torrada); reforçar reposição hidroeletrolítica e reintroduzir gordura/lactose conforme melhora do trânsito.',
+  },
+  constipacao: {
+    label: 'Constipação',
+    bloqueios: ['REDUZIR ARROZ BRANCO EM EXCESSO'],
+    prefs: ['VITAMINA DE LEITE + MAMÃO + BANANA + MIX DE FIBRAS + GELO','PREF.: ABACAXI DE SOBREMESA','AMEIXA PRETA OU SUCO DE AMEIXA','AVEIA'],
+    preparo: 'Reforçar fibras solúveis e insolúveis de forma gradual (aveia, mamão, ameixa), hidratação e, se possível, estímulo à mobilidade. Vitamina de leite + mamão + banana + mix de fibras + gelo é boa opção prática de sobremesa/lanche.',
+  },
+  pastosa_fria: {
+    label: 'Dieta pastosa fria (pós-op. ORL/septonasal, amigdalectomia)',
+    bloqueios: ['SEM ALIMENTOS QUENTES','SEM ALIMENTOS ÁCIDOS/CÍTRICOS','SEM ALIMENTOS COM GRUMOS/PEDAÇOS'],
+    prefs: ['SORVETE/PICOLÉ DE FRUTA','IOGURTE GELADO','MOUSSE','GELATINA','MINGAU FRIO'],
+    preparo: 'Ideias de preparo: mousse de frutas, iogurte batido com suplemento em pó, gelatina, mingau frio, sorvete/picolé de fruta. Evitar temperaturas quentes e texturas com grumos.',
+    suplemento: 'Se aceitação reduzida: iogurte batido com suplemento em pó (ex.: Fortimel Compact Protein — Danone; Fresubin Protein Powder — Fresenius Kabi) é boa forma de veicular o suplemento na consistência pastosa fria.',
+  },
+};
+
 /* ---------------- STATE ---------------- */
 const MEALS = ['Desjejum','Colação','Almoço','Lanche da tarde','Jantar','Ceia'];
 let state = {
@@ -522,13 +613,14 @@ let state = {
   triResultado:'',
   dietaTasy:'', dietaPos:'', dietaEspecial:'nao',
   caneta:'nao', canetaNome:'',
+  condicoes:[], sugerirSuplemento:'nao',
   aceitacao:{}, apetite:'', preferenciasTxt:'', bloqueiosTxt:'',
   alergias:'', intolerancias:'', sensibilidades:'',
   sintomas:[], obsGastro:'',
   evacuacao:'', evacMed:'nao', evacMedicamento:'', evacUltimaData:'',
   hidratacao:'', jejum:'nao', jejumHorario:'', jejumMotivo:'',
   comorbidades:[], outrasComorb:'', riscoNutricional:'nao', outrasCondicoesRelevantes:'', outrasCondicoesEspecializada:'nao',
-  especClinica:'', prefItems:[], preferenciasHandled:[], bloqueiosEdit:null, copeiraTxt:'', evolucaoEdit:null
+  especClinica:'', prefItems:[], preferenciasHandled:[], condicoesHandled:[], bloqueiosEdit:null, copeiraTxt:'', evolucaoEdit:null
 };
 MEALS.forEach(m=>state.aceitacao[m]='100%');
 
@@ -546,6 +638,27 @@ function setTheme(t){
 document.getElementById('themeToggle').onclick = ()=>{ setTheme(html.getAttribute('data-theme')==='dark' ? 'comfort':'dark'); };
 (async()=>{ try{ const r = await window.storage.get('theme', false); if(r) setTheme(r.value); }catch(e){} })();
 
+/* ---------------- CONDIÇÕES CLÍNICAS UI ---------------- */
+const fCondicoesEl = document.getElementById('fCondicoes');
+Object.keys(CONDICOES).forEach(key=>{
+  const opt = document.createElement('div');
+  opt.className='opt';
+  opt.dataset.v = key;
+  opt.textContent = CONDICOES[key].label;
+  fCondicoesEl.appendChild(opt);
+});
+fCondicoesEl.querySelectorAll('.opt').forEach(o=>{
+  o.onclick = ()=>{
+    o.classList.toggle('on');
+    const v = o.dataset.v;
+    const i = state.condicoes.indexOf(v);
+    if(o.classList.contains('on')){ if(i===-1) state.condicoes.push(v); }
+    else{ if(i>-1) state.condicoes.splice(i,1); }
+    recalc();
+  };
+});
+bindSingleLater('fSugerirSuplemento', v=>{ state.sugerirSuplemento=v; recalc(); });
+
 /* ---------------- GENERIC HELPERS ---------------- */
 function bindSingle(containerId, onChange){
   const c = document.getElementById(containerId);
@@ -557,6 +670,7 @@ function bindSingle(containerId, onChange){
     };
   });
 }
+function bindSingleLater(containerId, onChange){ bindSingle(containerId, onChange); }
 function bindMulti(containerId, arr, onChange, exclusiveVal){
   const c = document.getElementById(containerId);
   c.querySelectorAll('.opt').forEach(o=>{
@@ -613,7 +727,7 @@ document.getElementById('fComorbidades').addEventListener('click', (ev)=>{
 
 const textBindings = [
   ['fLeito','leito'],['fAndar','andar'],['fPeso','peso'],['fAltura','altura'],['fPPR','ppr'],
-  ['fTriResultado','triResultado'],['fDietaTasy','dietaTasy'],['fDietaPos','dietaPos'],
+  ['fTriResultado','triResultado'],['fDietaPos','dietaPos'],
   ['fPreferencias','preferenciasTxt'],['fBloqueios','bloqueiosTxt'],
   ['fAlergias','alergias'],['fIntolerancias','intolerancias'],['fSensibilidades','sensibilidades'],
   ['fHidratacao','hidratacao'],['fJejumHorario','jejumHorario'],['fJejumMotivo','jejumMotivo'],
@@ -692,6 +806,48 @@ function renderPrefPendentes(){
     };
     wrap.appendChild(chip);
   });
+}
+
+/* Condições clínicas selecionadas -> auto-adiciona bloqueios/preferências à Gestão,
+   e monta o painel de sugestões de preparo/suplemento. */
+function applyCondicoesAuto(){
+  state.condicoesHandled = state.condicoesHandled || [];
+  state.condicoes.forEach(key=>{
+    if(state.condicoesHandled.includes(key)) return;
+    const c = CONDICOES[key];
+    if(!c) return;
+    (c.bloqueios||[]).forEach(txt=>{ state.bloqueiosAuto.push(txt); });
+    (c.prefs||[]).forEach(txt=>{ state.prefItems.push({refeicao:'Todos os serviços', texto:`PREF.: ${txt}`}); });
+    state.condicoesHandled.push(key);
+  });
+  // remove blocos automáticos de condições que foram desmarcadas
+  state.condicoesHandled = state.condicoesHandled.filter(key=>{
+    if(state.condicoes.includes(key)) return true;
+    const c = CONDICOES[key];
+    if(c){
+      state.bloqueiosAuto = state.bloqueiosAuto.filter(t=> !(c.bloqueios||[]).includes(t));
+      state.prefItems = state.prefItems.filter(it=> !(c.prefs||[]).some(p=>it.texto===`PREF.: ${p}`));
+    }
+    return false;
+  });
+}
+function renderSugestoesCondicoes(){
+  const body = document.getElementById('sugestoesCondicoesBody');
+  if(state.condicoes.length===0){
+    body.textContent = 'Marque uma condição clínica no Formulário para ver aqui ideias de preparo (vitaminas, mingaus, mousses, tapiocas...) e, se ativado, sugestões de suplemento oral.';
+    return;
+  }
+  let html = '';
+  state.condicoes.forEach(key=>{
+    const c = CONDICOES[key];
+    if(!c) return;
+    html += `<div style="margin-bottom:12px;"><b>${c.label}</b><br>${c.preparo||''}`;
+    if(state.sugerirSuplemento==='sim' && c.suplemento){
+      html += `<br><span style="color:var(--accent);">💊 Suplemento (opcional): ${c.suplemento}</span>`;
+    }
+    html += `</div>`;
+  });
+  body.innerHTML = html;
 }
 
 /* Aceitação por refeição */
@@ -955,16 +1111,21 @@ function recalc(){
 
   const {nivel, motivo} = calcNivelInfo();
   const dias = diasPorNivel(nivel);
-  const proxima = addDays(dataVisita, dias);
+  const proxima = addDays(nowBR(), dias);
+  /* Reavaliação do instrumento de triagem (NRS-2002/MNA/STRONG Kids): sempre
+     7 dias a partir de hoje, independente do nível de assistência — é um
+     critério fixo do protocolo, diferente da próxima visita (que varia por nível). */
+  const proximaTriagem = addDays(nowBR(), 7);
 
   state._imc=imc; state._oms=oms; state._z=z; state._percentil=percentil; state._indicadorPed=indicadorPed;
-  state._nivel=nivel; state._justificativa=motivo; state._proxima=proxima; state._dataVisita=dataVisita;
+  state._nivel=nivel; state._justificativa=motivo; state._proxima=proxima; state._proximaTriagem=proximaTriagem; state._dataVisita=dataVisita;
   state._idade=idade; state._faixa=faixa; state._protocolo=protocolo;
 
   document.getElementById('calcIMC').textContent = imc? imc.toFixed(1) : '—';
   document.getElementById('calcOMS').textContent = oms;
   document.getElementById('calcNivel').textContent = nivel;
   document.getElementById('calcProxima').textContent = fmtDate(proxima);
+  document.getElementById('calcProximaTriagem').textContent = fmtDate(proximaTriagem) + ' (reavaliação de triagem, sempre +7d)';
   document.getElementById('justificativaPreview').textContent = motivo + ` Próxima visita programada para ${fmtDate(proxima)}.`;
   document.getElementById('hdrLeito').textContent = state.leito || '—';
   document.getElementById('hdrData').textContent = fmtDate(dataVisita);
@@ -978,7 +1139,9 @@ function recalc(){
   document.getElementById('protocoloTag2').textContent = protocolo.sigla;
   document.getElementById('triResultLabel').textContent = `Resultado (${protocolo.nome})`;
 
+  applyCondicoesAuto();
   renderGestao();
+  renderSugestoesCondicoes();
   renderEvolucao();
   scheduleAutosave();
 }
@@ -999,8 +1162,9 @@ function scheduleAutosave(){
 function renderGestao(){
   const altM = state.altura ? (parseFloat(state.altura)/100).toFixed(2).replace('.',',') : '—';
   const proxima = state._proxima ? fmtDate(state._proxima) : '—';
+  const proximaTriagem = state._proximaTriagem ? fmtDate(state._proximaTriagem) : '—';
   const protoLabel = `${state._protocolo.sigla} (${faixaLabel(state._faixa)})`;
-  let info = `Informações nutricionais: P: ${state.peso||'—'} Kg // A: ${altM} m // Próxima visita: ${proxima} // ${protoLabel}: ${proxima} // Nível de assistência: ${state._nivel||'—'}.`;
+  let info = `Informações nutricionais: P: ${state.peso||'—'} Kg // A: ${altM} m // Próxima visita: ${proxima} // ${protoLabel}: ${proximaTriagem} // Nível de assistência: ${state._nivel||'—'}.`;
   const obsItems = (state.especClinica||'').split(',').map(s=>s.trim()).filter(Boolean);
   if(obsItems.length) info += '\n\n' + obsItems.map(o=>`>>${o.toUpperCase()}<<`).join('\n');
   document.getElementById('genInfoNutri').textContent = info;
@@ -1014,6 +1178,7 @@ function renderGestao(){
     if(intolList.length) lines.push(`BLOQ.: ${intolList.join(', ').toUpperCase()} (INTOLERÂNCIA)`);
     if(sensList.length) lines.push(`BLOQ.: ${sensList.join(', ').toUpperCase()} (SENSIBILIDADE)`);
     state.bloqueiosTxt.split(',').map(s=>s.trim()).filter(Boolean).forEach(a=>lines.push(`BLOQ.: ${a.toUpperCase()}`));
+    (state.bloqueiosAuto||[]).forEach(t=>lines.push(`BLOQ.: ${t}`));
     document.getElementById('genBloqueios').value = lines.join('\n');
   }
   renderPrefPendentes();
@@ -1114,8 +1279,7 @@ function fraseAceitacao(){
   return 'Aceitação alimentar: ' + filled.map(m=>`${m.toLowerCase()} ${state.aceitacao[m]}`).join(', ') + '.';
 }
 function fraseDieta(){
-  const padrao = state.dietaPos || state.dietaTasy;
-  return padrao ? `Em uso de ${padrao.toLowerCase()}.` : 'Padrão alimentar não especificado.';
+  return state.dietaPos ? state.dietaPos.toLowerCase() : 'conforme prescrição médica';
 }
 function fraseCaneta(){
   if(state.caneta==='sim') return `Faz uso de caneta emagrecedora${state.canetaNome ? ' ('+state.canetaNome+')' : ''}.`;
@@ -1148,7 +1312,7 @@ function fraseApetite(){
 function renderEvolucaoAdulto(){
   if(state.evolucaoEdit!==null) return;
   const proxima = state._proxima ? fmtDate(state._proxima) : '—';
-  const dieta = state.dietaPos || state.dietaTasy || 'não especificada';
+  const dieta = fraseDieta();
   const linhas = [
     fraseEstadoGeralAdulto(),
     '',
@@ -1156,7 +1320,7 @@ function renderEvolucaoAdulto(){
     '',
     `AVALIAÇÃO NUTRICIONAL: Triagem nutricional realizada pelo NRS-2002: ${state.triResultado||'não realizada'}. Estado nutricional: ${state._oms} (IMC: ${fmtIMC(state._imc)} kg/m²).`,
     '',
-    `PADRÃO ALIMENTAR: Dieta prescrita: ${dieta}. ${listOrNegative(state.alergias,'Nega alergias alimentares.','Refere alergia a ')} ${listOrNegative(state.intolerancias,'Nega intolerâncias alimentares.','Refere intolerância a ')} ${listOrNegative(state.sensibilidades,'Nega sensibilidades alimentares.','Refere sensibilidade a ')} ${fraseApetite()} ${frasePrefsBloqueiosGenerica()} ${fraseCaneta()}`,
+    `PADRÃO ALIMENTAR: ${listOrNegative(state.alergias,'Nega alergias alimentares.','Refere alergia a ')} ${listOrNegative(state.intolerancias,'Nega intolerâncias alimentares.','Refere intolerância a ')} ${listOrNegative(state.sensibilidades,'Nega sensibilidades alimentares.','Refere sensibilidade a ')} ${fraseApetite()} ${frasePrefsBloqueiosGenerica()} ${fraseCaneta()}`,
     '',
     `ACEITAÇÃO ALIMENTAR: ${aceitacaoLinhaPed()}`,
     '',
@@ -1165,19 +1329,19 @@ function renderEvolucaoAdulto(){
     `HIDRATAÇÃO: ${state.hidratacao||'—'} L/dia.`,
     '',
     'CONDUTA NUTRICIONAL:',
-    '• Mantenho/Altero dieta prescrita;',
+    `• Mantenho/Altero dieta ${dieta};`,
     '• Ajusto planejamento alimentar conforme preferências e bloqueios alimentares;',
     '• Monitoro aceitação alimentar, sintomas gastrointestinais, hábito intestinal e hidratação;',
     '• Oriento quanto à hidratação e alimentação adequada;',
     '• Acompanho manutenção do estado nutricional;',
-    '• Acolho dúvidas, críticas e elogios.'
+    '• Acolho críticas e elogios.'
   ];
   document.getElementById('genEvolucao').value = linhas.join('\n');
 }
 function renderEvolucaoIdoso(){
   if(state.evolucaoEdit!==null) return;
   const proxima = state._proxima ? fmtDate(state._proxima) : '—';
-  const dieta = state.dietaPos || state.dietaTasy || 'não especificada';
+  const dieta = fraseDieta();
   const linhas = [
     fraseEstadoGeralAdulto(),
     '',
@@ -1185,7 +1349,7 @@ function renderEvolucaoIdoso(){
     '',
     `AVALIAÇÃO NUTRICIONAL: Triagem nutricional realizada pela Mini Avaliação Nutricional (MNA): ${state.triResultado||'não realizada'}. Estado nutricional classificado como ${(state._oms||'—').toLowerCase()} segundo os critérios da OPAS (IMC: ${fmtIMC(state._imc)} kg/m²).`,
     '',
-    `PADRÃO ALIMENTAR: Dieta prescrita: ${dieta}. ${listOrNegative(state.alergias,'Nega alergias alimentares.','Refere alergia a ')} ${listOrNegative(state.intolerancias,'Nega intolerâncias alimentares.','Refere intolerância a ')} ${listOrNegative(state.sensibilidades,'Nega sensibilidades alimentares.','Refere sensibilidade a ')} ${fraseApetite()} ${frasePrefsBloqueiosGenerica()} ${fraseCaneta()}`,
+    `PADRÃO ALIMENTAR: ${listOrNegative(state.alergias,'Nega alergias alimentares.','Refere alergia a ')} ${listOrNegative(state.intolerancias,'Nega intolerâncias alimentares.','Refere intolerância a ')} ${listOrNegative(state.sensibilidades,'Nega sensibilidades alimentares.','Refere sensibilidade a ')} ${fraseApetite()} ${frasePrefsBloqueiosGenerica()} ${fraseCaneta()}`,
     '',
     `ACEITAÇÃO ALIMENTAR: ${aceitacaoLinhaPed()}`,
     '',
@@ -1194,12 +1358,12 @@ function renderEvolucaoIdoso(){
     `HIDRATAÇÃO: ${state.hidratacao||'—'} L/dia.`,
     '',
     'CONDUTA NUTRICIONAL:',
-    '• Mantenho/Altero dieta prescrita;',
+    `• Mantenho/Altero dieta ${dieta};`,
     '• Ajusto planejamento alimentar conforme preferências e bloqueios alimentares;',
     '• Monitoro aceitação alimentar, sintomas gastrointestinais, hábito intestinal e hidratação;',
     '• Oriento quanto à hidratação e alimentação adequada;',
     '• Acompanho manutenção do estado nutricional;',
-    '• Acolho dúvidas, críticas e elogios.'
+    '• Acolho críticas e elogios.'
   ];
   document.getElementById('genEvolucao').value = linhas.join('\n');
 }
@@ -1236,7 +1400,7 @@ function aceitacaoLinhaPed(){
 function renderEvolucaoPediatrica(){
   if(state.evolucaoEdit!==null) return;
   const proxima = state._proxima ? fmtDate(state._proxima) : '__/__/____';
-  const condutaDieta = state.especClinica || state.dietaPos || state.dietaTasy || '________________';
+  const condutaDieta = state.especClinica || state.dietaPos || '________________';
   const linhas = [
     `Andar: ${state.andar||'___'}  Leito: ${state.leito||'___'}`,
     '',
@@ -1251,7 +1415,7 @@ function renderEvolucaoPediatrica(){
     '• Acompanho hábito intestinal, nível de hidratação, apetite e aceitação alimentar;',
     '• Oriento o responsável quanto à hidratação e à alimentação adequada, conforme faixa etária e condição clínica;',
     '• Acompanho a manutenção do estado nutricional por meio das curvas de crescimento da OMS;',
-    '• Acolho dúvidas, críticas e elogios.'
+    '• Acolho críticas e elogios.'
   ];
   document.getElementById('genEvolucao').value = linhas.join('\n');
 }
@@ -1365,6 +1529,7 @@ async function renderPainel(){
 
 /* ---------------- INIT ---------------- */
 (function init(){
+  state.bloqueiosAuto = [];
   const d = nowBR();
   state.data = d.toISOString();
   document.getElementById('fData').value = fmtDate(d);
@@ -1374,6 +1539,7 @@ async function renderPainel(){
   document.getElementById('fRisco').querySelector('[data-v="nao"]').classList.add('on');
   document.getElementById('fOutrasEspecializada').querySelector('[data-v="nao"]').classList.add('on');
   document.getElementById('dietaEspecial').querySelector('[data-v="nao"]').classList.add('on');
+  document.getElementById('fSugerirSuplemento').querySelector('[data-v="nao"]').classList.add('on');
   recalc();
 })();
 </script>
